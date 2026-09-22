@@ -6,7 +6,9 @@ type Entry = { id: string; speaker: string; kind: string; text: string; source: 
 
 export function TranscriptView({ entries, interviewerName, candidateName, className, interim }: { entries: Entry[]; interviewerName: string; candidateName: string; className?: string; interim?: string }) {
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ block: "end", behavior: "smooth" }), [entries.length, interim]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: "end", behavior: "smooth" });
+  }, [entries.length, interim]);
   return (
     <div className={cn("space-y-3 overflow-y-auto text-sm", className)} aria-live="polite" aria-label="Interview transcript">
       {entries.length === 0 && <p className="text-ink-400">The transcript will appear here as the interview progresses.</p>}

@@ -51,7 +51,9 @@ export function SidebarNav({ items, onNavigate }: { items: NavItem[]; onNavigate
 export function MobileNav({ items }: { items: NavItem[] }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
   return (
     <>
       <button onClick={() => setOpen(true)} className="rounded-lg p-2 text-ink-700 hover:bg-ink-100" aria-label="Open navigation" aria-expanded={open}>

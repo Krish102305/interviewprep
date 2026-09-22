@@ -311,7 +311,9 @@ function GuideQuestions({ id, guide, activeId, onChange }: { id: string; guide: 
   const main = guide.filter((q) => !q.isFollowUp);
   const activeRoot = guide.find((q) => q.id === activeId)?.parentQuestionId ?? activeId;
   const activeRef = useRef<HTMLLIElement>(null);
-  useEffect(() => activeRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }), [activeRoot]);
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [activeRoot]);
 
   async function ask(body: object, key: string) {
     setBusy(key);

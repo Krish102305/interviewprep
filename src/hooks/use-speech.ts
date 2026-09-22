@@ -37,7 +37,9 @@ export function useSpeechRecognition(onFinal: (text: string) => void) {
   const cb = useRef(onFinal);
   cb.current = onFinal;
 
-  useEffect(() => setSupported(Boolean(getCtor())), []);
+  useEffect(() => {
+    setSupported(Boolean(getCtor()));
+  }, []);
 
   const start = useCallback(() => {
     const Ctor = getCtor();
