@@ -4,17 +4,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/db.mjs generate && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run tests/unit.test.ts",
-    "db:push": "prisma db push",
+    "db:push": "node scripts/db.mjs db push",
     "db:seed": "tsx --conditions=react-server prisma/seed.ts",
-    "db:reset": "prisma db push --force-reset && npm run db:seed",
-    "postinstall": "prisma generate",
-    "setup": "prisma db push && npm run db:seed",
-    "test:e2e": "vitest run tests/e2e.test.ts"
+    "postinstall": "node scripts/db.mjs generate",
+    "setup": "node scripts/db.mjs db push && npm run db:seed",
+    "test:e2e": "vitest run tests/e2e.test.ts",
+    "start:prod": "node scripts/db.mjs db push --skip-generate && next start"
   },
   "prisma": {
     "seed": "tsx --conditions=react-server prisma/seed.ts"
@@ -51,5 +51,8 @@
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vitest": "^5.0.1"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

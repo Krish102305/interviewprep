@@ -35,6 +35,7 @@ Demo accounts (password **`demo1234`**, also available as one-click buttons on t
 | `npm run dev` / `build` / `start` | Next.js dev server / production build / production server |
 | `npm run setup` | `prisma db push` + seed |
 | `npm run db:seed` | Reload demo data (clears existing data) |
+| `npm run start:prod` | Production start: syncs the database schema, then starts the server |
 | `npm run typecheck` / `lint` | TypeScript / ESLint |
 | `npm test` | Unit tests: question engine, grading rubric, follow-ups, matching, conduct, validation |
 | `npm run test:e2e` | End-to-end API tests against a real `next start` server and a fresh seeded DB (run `npm run build` first) |
@@ -42,7 +43,7 @@ Demo accounts (password **`demo1234`**, also available as one-click buttons on t
 ## Stack
 
 - **Next.js 15** (App Router, React 19, TypeScript, strict mode), Tailwind CSS
-- **Prisma** + SQLite for local development (schema is Postgres-ready: change the `provider` and `DATABASE_URL`)
+- **Prisma**: SQLite locally, PostgreSQL in production — chosen automatically from `DATABASE_URL` by `scripts/db.mjs`
 - **Claude** via the official `@anthropic-ai/sdk` (structured outputs + Zod) for question generation, follow-ups and grading
 - **WebRTC** peer-to-peer video with API-relayed signaling, **Web Speech API** for live transcription, `speechSynthesis` for the AI interviewer's voice
 - Custom session auth (bcrypt, httpOnly cookie, hashed tokens in the DB), optional Google OAuth
@@ -111,6 +112,22 @@ tests/                    unit + end-to-end tests
 | **Google OAuth** | Hidden. Email and password auth works. | "Continue with Google" appears. |
 | **Email** | In-app notifications only. Emails are skipped and logged as not configured. | Resend delivers important notifications. |
 | **Recording** | **Not implemented.** The UI says "not recorded", and consent is captured for the transcript only. | `recordingConsent` and the storage layer are in place for a future recorder. |
+
+## Deploying (Railway)
+
+The repo includes `railway.json`, so Railway knows how to build (`npm run build`), start (`npm run start:prod`) and health-check (`/api/health`) the app.
+
+1. On [railway.app](https://railway.app), create a project and choose **Deploy from GitHub repo** → this repository.
+2. In the project, click **+ New → Database → PostgreSQL**.
+3. On the app service, open **Variables** and add:
+   - `DATABASE_URL` = `${{Postgres.DATABASE_URL}}` (a reference to the database Railway created)
+   - `APP_URL` = your public URL, e.g. `https://interview-connect.up.railway.app`
+   - `ANTHROPIC_API_KEY` = your key
+   - `STORAGE_DIR` = `/data/storage`
+4. On the app service, open **Settings → Volumes**, add a volume mounted at `/data` (keeps uploaded resumes across deploys), and under **Networking** click **Generate Domain**.
+5. Optional: load the demo accounts once with `railway run npm run db:seed` (Railway CLI), or leave the site empty for real users.
+
+Any Postgres URL works: the build detects `postgres://` and uses a generated Postgres copy of the schema. Local development keeps using SQLite.
 
 ## Security & privacy
 

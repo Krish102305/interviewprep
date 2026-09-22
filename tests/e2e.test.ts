@@ -13,9 +13,13 @@ import type { PrismaClient } from "@prisma/client";
 const PORT = 3107;
 const BASE = `http://127.0.0.1:${PORT}`;
 const ROOT = path.resolve(__dirname, "..");
+// Set E2E_DATABASE_URL=postgresql://… to run the suite against Postgres (the
+// database must exist and be empty); defaults to a throwaway SQLite file.
+const DB_URL = process.env.E2E_DATABASE_URL || "file:./e2e.db";
+const IS_SQLITE = DB_URL.startsWith("file:");
 const ENV = {
   ...process.env,
-  DATABASE_URL: "file:./e2e.db",
+  DATABASE_URL: DB_URL,
   STORAGE_DIR: path.join(ROOT, "storage-e2e"),
   ANTHROPIC_API_KEY: "", // exercise the labelled development engine deterministically
   ANTHROPIC_AUTH_TOKEN: "",
@@ -87,14 +91,16 @@ const GOOD_ANSWER =
 
 beforeAll(async () => {
   if (!fs.existsSync(path.join(ROOT, ".next", "BUILD_ID"))) throw new Error("Run `npm run build` before the e2e tests.");
-  // Fresh, throwaway test database owned by this suite.
-  fs.rmSync(path.join(ROOT, "prisma", "e2e.db"), { force: true });
-  fs.rmSync(path.join(ROOT, "prisma", "e2e.db-journal"), { force: true });
-  execSync("npx prisma db push --skip-generate", { cwd: ROOT, env: ENV, stdio: "ignore" });
+  if (IS_SQLITE) {
+    // Fresh, throwaway test database owned by this suite.
+    fs.rmSync(path.join(ROOT, "prisma", "e2e.db"), { force: true });
+    fs.rmSync(path.join(ROOT, "prisma", "e2e.db-journal"), { force: true });
+  }
+  execSync("node scripts/db.mjs db push --skip-generate", { cwd: ROOT, env: ENV, stdio: "ignore" });
   execSync("npx tsx --conditions=react-server prisma/seed.ts", { cwd: ROOT, env: ENV, stdio: "ignore" });
   process.env.DATABASE_URL = ENV.DATABASE_URL!;
   const { PrismaClient } = await import("@prisma/client");
-  db = new PrismaClient({ datasources: { db: { url: "file:" + path.join(ROOT, "prisma", "e2e.db") } } });
+  db = new PrismaClient({ datasources: { db: { url: IS_SQLITE ? "file:" + path.join(ROOT, "prisma", "e2e.db") : DB_URL } } });
   server = spawn("npx", ["next", "start", "-p", String(PORT)], { cwd: ROOT, env: ENV, stdio: "ignore" });
   await until(() => fetch(`${BASE}/api/rtc-config`).then((r) => r.status).catch(() => 0), (s) => s === 401, "server start", 60000);
 });
