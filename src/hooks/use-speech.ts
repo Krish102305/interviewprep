@@ -63,7 +63,12 @@ export function useSpeechRecognition(onFinal: (text: string) => void) {
       if (e.error === "not-allowed" || e.error === "service-not-allowed") {
         want.current = false;
         setError("Microphone permission was denied for speech-to-text. You can type your answers instead.");
-      } else if (e.error !== "no-speech" && e.error !== "aborted") setError(`Speech recognition error: ${e.error}`);
+      } else if (e.error === "audio-capture") {
+        want.current = false;
+        setError("No microphone is available for speech-to-text. You can type your answers instead.");
+      } else if (e.error === "network") {
+        setError("The browser's speech service is unreachable right now — keep talking or type your answer; we'll retry automatically.");
+      } else if (e.error !== "no-speech" && e.error !== "aborted") setError("Speech-to-text hit a problem. You can type your answers instead.");
     };
     r.onend = () => {
       rec.current = null;

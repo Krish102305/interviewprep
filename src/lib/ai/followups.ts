@@ -26,7 +26,6 @@ export function ruleBasedFollowUp(question: QuestionForFollowUp, answer: string,
   const behavioralLike = ["behavioral", "intro"].includes(question.category);
   const candidates: { text: string; rationale: string }[] = [];
 
-  if (a.words < 45) candidates.push({ text: "Could you walk me through that in a bit more detail?", rationale: "The answer was brief." });
   if (behavioralLike) {
     if (!a.star.result)
       candidates.push({ text: "What was the outcome? If you can, put a number or concrete result on it.", rationale: "No clear result (STAR 'R')." });
@@ -40,6 +39,8 @@ export function ruleBasedFollowUp(question: QuestionForFollowUp, answer: string,
     if (a.reasoningMarkers < 2)
       candidates.push({ text: "Walk me through your reasoning — why that approach over the alternatives?", rationale: "Reasoning was not explained." });
   }
+  // Specific gaps first; a generic "more detail" probe only if nothing specific is missing.
+  if (a.words < 45) candidates.push({ text: "Could you walk me through that in a bit more detail?", rationale: "The answer was brief." });
   for (const f of question.followUps) candidates.push({ text: f, rationale: `Suggested probe for: ${question.whatItTests}.` });
   candidates.push({ text: "What would you do differently if you faced that again?", rationale: "Tests reflection." });
 

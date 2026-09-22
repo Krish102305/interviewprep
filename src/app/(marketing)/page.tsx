@@ -31,7 +31,7 @@ const features = [
 
 function HeroVisual() {
   return (
-    <div className="relative mx-auto w-full max-w-xl lg:max-w-none" aria-hidden>
+    <div className="relative mx-auto w-full max-w-xl pb-16 lg:max-w-none" aria-hidden>
       <div className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-gradient-to-br from-olive-100 via-paper to-ink-100 blur-2xl" />
       <div className="overflow-hidden rounded-3xl border border-ink-200 bg-ink-950 shadow-2xl">
         <div className="flex items-center justify-between border-b border-white/10 px-5 py-3 text-xs text-ink-300">
@@ -58,7 +58,7 @@ function HeroVisual() {
           <p className="mt-2 text-sm font-medium leading-relaxed text-ink-900">“Tell me about a time you had to lead a team through a difficult situation.”</p>
         </div>
       </div>
-      <div className="absolute -bottom-6 -left-4 hidden w-56 rounded-2xl border border-ink-200 bg-white p-4 shadow-lift sm:block lg:-left-10">
+      <div className="absolute -bottom-28 -left-4 hidden w-56 rounded-2xl border border-ink-200 bg-white p-4 shadow-lift sm:block lg:-left-10">
         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-500">AI Evaluation</p>
         <div className="mt-2 flex items-end gap-2">
           <span className="text-3xl font-semibold tracking-tight text-ink-950">84</span>

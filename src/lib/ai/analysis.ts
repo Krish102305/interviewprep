@@ -76,12 +76,17 @@ export function analyzeAnswer(answer: string, keywords: string[] = []): AnswerAn
 }
 
 /** A short, verbatim excerpt from the answer — the most concrete sentence available. */
-export function excerpt(answer: string, maxWords = 28) {
+export function excerpt(answer: string, maxWords = 28, keywords: string[] = []) {
   const sentences = answer
     .split(/(?<=[.!?])\s+/)
     .map((s) => s.trim())
     .filter((s) => s.split(/\s+/).length >= 5);
-  const pick = sentences.find((s) => /\d|result|led|built|decided|because/i.test(s)) ?? sentences[0] ?? answer.trim();
+  const kw = keywords.map((k) => k.toLowerCase()).filter((k) => k.length > 2);
+  const pick =
+    (kw.length ? sentences.find((s) => kw.some((k) => s.toLowerCase().includes(k))) : undefined) ??
+    sentences.find((s) => /\d|result|led|built|decided|because/i.test(s)) ??
+    sentences[0] ??
+    answer.trim();
   const words = pick.split(/\s+/);
   return words.length > maxWords ? `${words.slice(0, maxWords).join(" ")}…` : pick;
 }

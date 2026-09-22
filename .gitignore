@@ -10,3 +10,4 @@ prisma/*.db-journal
 storage/*
 !storage/.gitkeep
 coverage
+storage-e2e

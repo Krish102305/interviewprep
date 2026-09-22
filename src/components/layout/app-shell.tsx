@@ -52,7 +52,8 @@ export async function AppShell({ user, children }: { user: SessionUser; children
   const roleLabel = user.role === "admin" ? "Admin" : user.role === "interviewer" ? "Interviewer" : "Student";
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[256px_1fr]">
-      <aside className="sticky top-0 hidden h-screen flex-col border-r border-ink-200/80 bg-white lg:flex">
+      <div className="hidden border-r border-ink-200/80 bg-white lg:block">
+      <aside className="sticky top-0 flex h-screen flex-col">
         <div className="px-5 py-5">
           <Logo href="/" />
         </div>
@@ -61,6 +62,7 @@ export async function AppShell({ user, children }: { user: SessionUser; children
           <UserMenu name={name} email={user.email} initials={initials(user.profile)} roleLabel={roleLabel} />
         </div>
       </aside>
+      </div>
       <div className="flex min-w-0 flex-col">
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-ink-200/80 bg-paper/85 px-4 backdrop-blur sm:px-6">
           <div className="flex items-center gap-3 lg:hidden">

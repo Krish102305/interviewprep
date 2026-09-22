@@ -8,14 +8,16 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run tests/unit.test.ts",
     "db:push": "prisma db push",
-    "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "prisma db push --force-reset && tsx prisma/seed.ts",
-    "postinstall": "prisma generate"
+    "db:seed": "tsx --conditions=react-server prisma/seed.ts",
+    "db:reset": "prisma db push --force-reset && npm run db:seed",
+    "postinstall": "prisma generate",
+    "setup": "prisma db push && npm run db:seed",
+    "test:e2e": "vitest run tests/e2e.test.ts"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx --conditions=react-server prisma/seed.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",

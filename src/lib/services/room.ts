@@ -5,7 +5,7 @@ import { FOLLOW_UPS_PER_QUESTION, LABELS } from "@/lib/constants";
 import { shortName } from "@/lib/format";
 import type { SessionUser } from "@/lib/auth/session";
 import { decideNextTurn, replyToCandidateQuestions, suggestFollowUp } from "@/lib/ai/followups";
-import { guideQuestion, loadForUser, type ParticipantRole } from "./interviews";
+import { guideQuestion, loadForUser } from "./interviews";
 import { escalateIfRepeated, issueWarning, recordConductEvent } from "./conduct";
 import { track } from "./analytics";
 
@@ -32,6 +32,19 @@ export async function getRoomState(interviewId: string, user: SessionUser) {
       create: { interviewId, userId: user.id, participantRole: role, lastSeenAt: new Date(), connectionState: "connected" },
       update: { lastSeenAt: new Date() },
     });
+  }
+
+  // Both participants may be ready before the guide finishes generating — start once it is.
+  if (iv.mode === "human" && iv.status === "waiting" && iv.questionStatus === "ready" && iv.interviewerId) {
+    const ready = await db.interviewSession.count({ where: { interviewId, ready: true, userId: { in: [iv.studentId, iv.interviewerId] } } });
+    if (ready === 2) {
+      const started = await db.interview.updateMany({ where: { id: interviewId, status: "waiting" }, data: { status: "active", startedAt: new Date() } });
+      if (started.count) {
+        iv.status = "active";
+        iv.startedAt = new Date();
+        await track("interview_started", iv.studentId, { mode: "human", type: iv.type });
+      }
+    }
   }
 
   const [questions, transcript, sessions, people, warnings] = await Promise.all([

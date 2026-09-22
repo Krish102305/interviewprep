@@ -174,7 +174,7 @@ export function gradeWithRubric(input: GradingInput): EvaluationResult {
   const questionFeedback: QuestionFeedback[] = answered.map((p) => ({
     questionId: p.questionId,
     question: p.question,
-    answerExcerpt: p.answer.trim() ? excerpt(p.answer) : null,
+    answerExcerpt: p.answer.trim() ? excerpt(p.answer, 28, p.keywords) : null,
     score: p.score,
     feedback: !p.answer.trim()
       ? "No answer was captured for this question."

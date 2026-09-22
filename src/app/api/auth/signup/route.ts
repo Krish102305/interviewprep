@@ -23,5 +23,5 @@ export const POST = route(
     await track("signup", user.id, { role: user.role, method: "password" });
     return { ok: true, redirect: "/onboarding" };
   },
-  { rateLimit: { key: "signup", limit: 10, windowSec: 3600 } },
+  { rateLimit: { key: "signup", limit: 20, windowSec: 3600 } },
 );

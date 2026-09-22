@@ -185,6 +185,7 @@ export async function sweepStaleInterviews() {
   for (const iv of lateHuman) {
     const joined = new Set(iv.sessions.filter((s) => s.joinedAt || s.ready).map((s) => s.userId));
     const noShows = [iv.studentId, iv.interviewerId!].filter((id) => !joined.has(id));
+    if (!noShows.length) continue; // both showed up (e.g. still waiting on the guide) — not a no-show
     await db.interview.update({ where: { id: iv.id }, data: { status: "no_show", noShowUserIds: JSON.stringify(noShows) } });
     await track("interview_no_show", null, { count: noShows.length });
     for (const uid of [iv.studentId, iv.interviewerId!]) {
