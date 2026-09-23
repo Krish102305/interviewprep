@@ -77,6 +77,15 @@ function answerFor(q: GeneratedQuestion, quality: number, i: number, company?: s
 // ---------------------------------------------------------------------------
 
 async function main() {
+  // The seed DELETES every account first. Never let it run against a real
+  // (hosted or PostgreSQL) database unless someone explicitly insists.
+  const url = process.env.DATABASE_URL ?? "";
+  const hosted = Boolean(process.env.RAILWAY_ENVIRONMENT_ID || process.env.RAILWAY_ENVIRONMENT_NAME || process.env.RAILWAY_ENVIRONMENT);
+  if ((hosted || /^postgres(ql)?:\/\//.test(url)) && process.env.I_UNDERSTAND_THIS_DELETES_ALL_USERS !== "yes") {
+    console.error("Refusing to seed: this would delete every real account in this database.");
+    console.error("Demo data is for local development only (SQLite).");
+    process.exit(1);
+  }
   console.log("Resetting demo data…");
   // Order matters for FK constraints in SQLite.
   for (const m of [

@@ -130,7 +130,7 @@ The repo includes `railway.json`, so Railway knows how to build (`npm run build`
    - `ELEVENLABS_API_KEY` = your key (optional — natural interviewer voices)
 4. On the app service, open **Settings → Volumes**, add a volume mounted at `/data` (keeps uploaded resumes across deploys), and under **Networking** click **Generate Domain**.
 5. Open your site, sign up with your own email, then make yourself admin (admin can never be chosen at sign-up): in the Railway CLI run `railway ssh`, then `npm run make-admin -- you@example.com`.
-6. Optional: load the demo accounts once with `railway run npm run db:seed` (Railway CLI), or leave the site empty for real users.
+6. Don't load demo data on the live site: `npm run db:seed` deletes every account before loading the demo users, so it refuses to run on Railway or against PostgreSQL. Demo data is for local development only.
 
 Any Postgres URL works: the build detects `postgres://` and uses a generated Postgres copy of the schema. Local development keeps using SQLite.
 
