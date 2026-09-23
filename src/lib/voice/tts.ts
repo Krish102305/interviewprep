@@ -7,11 +7,11 @@ import { PERSONAS } from "@/lib/ai/personas";
  * room falls back to the browser's built-in speech synthesis.
  */
 
-/** Default ElevenLabs premade voices per persona — override with ELEVENLABS_VOICE_<PERSONA>. */
+/** Default ElevenLabs premade voices per persona, override with ELEVENLABS_VOICE_<PERSONA>. */
 const DEFAULT_VOICES: Record<string, string> = {
-  ava: "EXAVITQu4vr4xnSDxMaL", // Sarah — warm, conversational American
-  marcus: "nPczCjzI2devNBz1zQrb", // Brian — deep, measured American
-  elena: "XrExE9yKIg1WjnnlVkGX", // Matilda — clear, professional American
+  ava: "EXAVITQu4vr4xnSDxMaL", // Sarah, warm, conversational American
+  marcus: "nPczCjzI2devNBz1zQrb", // Brian, deep, measured American
+  elena: "XrExE9yKIg1WjnnlVkGX", // Matilda, clear, professional American
 };
 
 /** eleven_multilingual_v2 is ElevenLabs' most lifelike stable model; eleven_flash_v2_5 is faster and cheaper but flatter. */
@@ -59,7 +59,7 @@ export async function synthesize(text: string, personaKey: string, signal?: Abor
   }).catch((err) => {
     if (signal?.aborted) throw err;
     console.error("[tts] couldn't reach ElevenLabs", err);
-    throw new TtsError("Couldn't reach ElevenLabs from the server — check your internet connection.", 502);
+    throw new TtsError("Couldn't reach ElevenLabs from the server. Check your internet connection.", 502);
   });
   if (!res.ok || !res.body) {
     const detail = await res.text().catch(() => "");
@@ -81,10 +81,10 @@ function explainFailure(status: number, body: string) {
     /* not JSON */
   }
   if (code.includes("quota") || /quota|credits/i.test(message)) return "ElevenLabs credits are used up (or the key's credit limit was reached).";
-  if (code.includes("permission") || /permission/i.test(message)) return "The ElevenLabs key doesn't have Text to Speech access — edit the key and allow it.";
-  if (code.includes("unusual_activity") || /unusual activity/i.test(message)) return "ElevenLabs blocked free-tier API use from this network — a paid plan fixes this.";
-  if (code.includes("voice_not_found") || /voice/i.test(code)) return "That ElevenLabs voice isn't available on your account — check the ELEVENLABS_VOICE_* settings.";
-  if (status === 401) return "The ElevenLabs API key was rejected — check ELEVENLABS_API_KEY in .env.";
+  if (code.includes("permission") || /permission/i.test(message)) return "The ElevenLabs key doesn't have Text to Speech access. Edit the key and allow it.";
+  if (code.includes("unusual_activity") || /unusual activity/i.test(message)) return "ElevenLabs blocked free-tier API use from this network. A paid plan fixes this.";
+  if (code.includes("voice_not_found") || /voice/i.test(code)) return "That ElevenLabs voice isn't available on your account. Check the ELEVENLABS_VOICE_* settings.";
+  if (status === 401) return "The ElevenLabs API key was rejected. Check ELEVENLABS_API_KEY in .env.";
   if (status === 429) return "ElevenLabs is rate-limiting requests right now.";
   return `ElevenLabs voice generation failed (HTTP ${status}${message ? `: ${message.slice(0, 120)}` : ""}).`;
 }

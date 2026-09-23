@@ -49,7 +49,7 @@ export async function issueWarning(userId: string, interviewId: string, source: 
     userId,
     "conduct_warning",
     "Interview conduct warning",
-    "You received a conduct warning during an interview. Warnings are not strikes — they're a chance to correct course.",
+    "You received a conduct warning during an interview. Warnings are not strikes. They're a chance to correct course.",
     `/interviews/${interviewId}`,
   );
   return ev;
@@ -57,7 +57,7 @@ export async function issueWarning(userId: string, interviewId: string, source: 
 
 /**
  * After a warning, if the user ignores repeated warnings in the same interview we
- * escalate to a *pending* report for human review — never an automatic strike.
+ * escalate to a *pending* report for human review, never an automatic strike.
  */
 export async function escalateIfRepeated(userId: string, interviewId: string) {
   const ignored = await db.conductEvent.count({ where: { userId, interviewId, type: "no_response" } });
@@ -176,7 +176,7 @@ export async function issueStrike(input: {
     await notify(
       input.userId,
       "strike_received",
-      "Final Warning — 2 / 3 strikes",
+      "Final Warning (2 / 3 strikes)",
       `A conduct report (${conductReasonLabel(input.reason)}) was confirmed. You currently have 2 / 3 confirmed strikes. One additional confirmed conduct violation will result in an account ban from Interview Connect interviews.`,
       "/conduct",
     );
@@ -184,7 +184,7 @@ export async function issueStrike(input: {
     await notify(
       input.userId,
       "strike_received",
-      "Interview Conduct Warning — 1 / 3 strikes",
+      "Interview Conduct Warning (1 / 3 strikes)",
       `You have received your first confirmed conduct strike (${conductReasonLabel(input.reason)}). Future confirmed violations can result in additional strikes. You can appeal from the Conduct page.`,
       "/conduct",
     );
@@ -238,7 +238,7 @@ async function cancelUpcomingFor(userId: string, reason: string) {
         iv.studentId,
         "interview_cancelled",
         "Your interviewer is no longer available",
-        "We've put your interview back into matching — you'll be notified when a new interviewer is found.",
+        "We've put your interview back into matching. You'll be notified when a new interviewer is found.",
         `/interviews/${iv.id}`,
       );
     }

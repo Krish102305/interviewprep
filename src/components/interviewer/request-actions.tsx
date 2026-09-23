@@ -13,7 +13,7 @@ export function MatchActions({ matchId }: { matchId: string }) {
     setBusy(action);
     try {
       const r = await api<{ interviewId?: string }>(`/api/matches/${matchId}`, { body: { action } });
-      toast.success(action === "accept" ? "Accepted! The interview guide is ready to review." : "Declined — we'll find another interviewer.");
+      toast.success(action === "accept" ? "Accepted! The interview guide is ready to review." : "Declined. We'll find another interviewer.");
       if (r.interviewId) router.push(`/interviews/${r.interviewId}`);
       else router.refresh();
     } catch (e) {

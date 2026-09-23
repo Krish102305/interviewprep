@@ -25,7 +25,7 @@ export const INTRO_QUESTIONS: BankQuestion[] = [
     category: "intro",
     whatItTests: "Concise personal narrative and motivation",
     competencies: ["communication", "self-awareness", "motivation"],
-    followUps: ["What's one experience from that story you're most proud of?", "Why now — what made you decide to pursue {role}?"],
+    followUps: ["What's one experience from that story you're most proud of?", "Why now? What made you decide to pursue {role}?"],
     gradingCriteria: ["Under ~2 minutes, structured past → present → future", "Connects experience to the role", "Ends with clear motivation"],
     keywords: ["experience", "currently", "interested", "because", "role", "project", "learned"],
     level: "any",
@@ -233,7 +233,7 @@ export const TECHNICAL_BANK: Record<RoleCategory, BankQuestion[]> = {
   ],
   consulting: [
     tech("beginner", "Estimate the number of coffee cups sold in the United States each day.", "Market sizing", ["market sizing", "quantitative reasoning"], ["population", "assume", "segment", "per day", "percentage", "sanity check", "million"], ["What's the assumption you're least confident in?", "How would you sanity-check that number?"], ["Clear structure before math", "Reasonable, stated assumptions", "Clean arithmetic", "Sanity check"], "case"),
-    tech("intermediate", "A regional coffee chain's profits have fallen 20% over two years. How would you figure out why?", "Profitability case", ["case structuring", "business strategy"], ["revenue", "costs", "price", "volume", "fixed", "variable", "competition", "framework", "customers"], ["Revenue is flat — where do you go next?", "What data would you ask the client for?"], ["Profit = revenue − costs tree", "Hypothesis driven", "Asks for data", "Synthesizes a recommendation"], "case"),
+    tech("intermediate", "A regional coffee chain's profits have fallen 20% over two years. How would you figure out why?", "Profitability case", ["case structuring", "business strategy"], ["revenue", "costs", "price", "volume", "fixed", "variable", "competition", "framework", "customers"], ["Revenue is flat, where do you go next?", "What data would you ask the client for?"], ["Profit = revenue − costs tree", "Hypothesis driven", "Asks for data", "Synthesizes a recommendation"], "case"),
     tech("intermediate", "Your client is considering entering the electric scooter rental market in a new city. What would you look at?", "Market entry", ["strategy", "case structuring"], ["market size", "competition", "customers", "regulation", "economics", "capabilities", "entry mode", "risk"], ["What would the unit economics of one scooter look like?", "What would make you recommend against entering?"], ["Market attractiveness", "Competitive landscape", "Client capabilities", "Economics and a clear recommendation"], "case"),
     tech("advanced", "A hospital wants to cut patient wait times in its emergency department by 30% without adding staff. How would you approach it?", "Operations case", ["operations", "problem solving"], ["bottleneck", "triage", "process", "capacity", "demand", "data", "scheduling", "flow"], ["Where do you expect the bottleneck to be?", "How would you measure the improvement?"], ["Maps patient flow", "Identifies bottlenecks with data", "Creative levers without staff", "Implementation risks"], "case"),
   ],

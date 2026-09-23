@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
 
 /**
- * Product analytics. Only event names, ids and enum-like properties are stored —
+ * Product analytics. Only event names, ids and enum-like properties are stored:
  * never free text, resumes or transcripts.
  */
 export type AnalyticsName =

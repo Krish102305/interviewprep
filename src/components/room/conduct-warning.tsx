@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 /**
  * "Interview Conduct Warning". Acknowledging clears it. If it goes unanswered for
  * 90 seconds we log a `no_response` signal (repeated ones are escalated to a
- * pending report for human review — never an automatic strike).
+ * pending report for human review, never an automatic strike).
  */
 export function ConductWarningModal({ interviewId, warning, onResolved }: { interviewId: string; warning: { id: string; details: string | null; source: string } | null; onResolved: () => void }) {
   const [busy, setBusy] = useState(false);
@@ -30,7 +30,7 @@ export function ConductWarningModal({ interviewId, warning, onResolved }: { inte
   }
 
   return (
-    <Modal open={Boolean(warning)} onClose={() => {}} dismissible={false} title="Interview Conduct Warning" size="sm" footer={<Button onClick={ack} loading={busy}>I&apos;m here — continue interview</Button>}>
+    <Modal open={Boolean(warning)} onClose={() => {}} dismissible={false} title="Interview Conduct Warning" size="sm" footer={<Button onClick={ack} loading={busy}>I&apos;m here. Continue interview</Button>}>
       <div className="flex gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-700"><ShieldAlert className="h-5 w-5" /></span>
         <div className="space-y-2 text-sm text-ink-700">

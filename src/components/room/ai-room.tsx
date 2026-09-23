@@ -59,7 +59,7 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
   // Hands-free conversation: listen automatically after the interviewer speaks and
   // send the answer when the candidate stops talking. Typing always works too.
   const [handsFree, setHandsFree] = useState(true);
-  const [hold, setHold] = useState(false); // "Hold on, I'm not done" — no auto-send until they speak again
+  const [hold, setHold] = useState(false); // "Hold on, I'm not done", no auto-send until they speak again
   const [typedEdit, setTypedEdit] = useState(false); // edited by keyboard → the candidate sends manually
   const [silence, setSilence] = useState(0); // 0–1 progress of the end-of-turn countdown
   const lastVoiceAt = useRef(Date.now());
@@ -96,7 +96,7 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
     if (speech.interim) heard();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [speech.interim]);
-  // Note: end-of-turn uses recognised words only — raw mic loudness would let
+  // Note: end-of-turn uses recognised words only, raw mic loudness would let
   // background noise (fans, typing) keep the turn open forever.
 
   const elapsed = useElapsed(state?.startedAt ?? null, state?.pausedAt ?? null, serverNow);
@@ -417,8 +417,8 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
               <li className="flex items-center gap-2"><span className={cn("h-2 w-2 rounded-full", media.hasAudio ? "bg-emerald-400" : "bg-amber-400")} />Microphone {media.hasAudio ? "ready" : "unavailable"}
                 {media.hasAudio && <span className="ml-2 inline-block h-1.5 w-24 overflow-hidden rounded-full bg-white/10"><span className="block h-full bg-olive-400 transition-all" style={{ width: `${media.level * 100}%` }} /></span>}
               </li>
-              <li className="flex items-center gap-2"><span className={cn("h-2 w-2 rounded-full", speech.supported ? "bg-emerald-400" : "bg-amber-400")} />{speech.supported ? "Live speech-to-text available" : "Speech-to-text not supported in this browser — you'll type answers"}</li>
-              <li className="flex items-center gap-2"><Volume2 className="h-3.5 w-3.5 text-ink-400" />Turn your volume up — {persona.firstName} speaks out loud{naturalVoice ? " (natural voice)" : ""}. Headphones work best.</li>
+              <li className="flex items-center gap-2"><span className={cn("h-2 w-2 rounded-full", speech.supported ? "bg-emerald-400" : "bg-amber-400")} />{speech.supported ? "Live speech-to-text available" : "Speech-to-text not supported in this browser. You'll type answers"}</li>
+              <li className="flex items-center gap-2"><Volume2 className="h-3.5 w-3.5 text-ink-400" />Turn your volume up: {persona.firstName} speaks out loud{naturalVoice ? " (natural voice)" : ""}. Headphones work best.</li>
             </ul>
             {media.error && <p className="mt-3 text-xs text-amber-300">{media.error}</p>}
             <Button variant="olive" size="lg" className="mt-8" onClick={begin} loading={starting}><Play className="h-4 w-4" /> Join interview</Button>
@@ -438,7 +438,7 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
       : !state.activeQuestion
         ? ""
         : handsFreeOn && !media.micOn
-          ? "Your microphone is muted — unmute to answer out loud, or type"
+          ? "Your microphone is muted. Unmute to answer out loud, or type"
           : handsFreeOn && speech.listening
             ? liveText
               ? hold || typedEdit
@@ -446,7 +446,7 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
                 : silence > 0
                   ? "Sending when you're done… keep talking to continue"
                   : "Listening…"
-              : "Your turn — just start talking"
+              : "Your turn. Just start talking"
             : "Your turn to answer";
 
   return (
@@ -467,7 +467,7 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
               {voiceOn && (
                 <span
                   className={cn("rounded-lg bg-black/55 px-2 py-1 text-[11px] font-medium backdrop-blur", naturalVoice ? "text-emerald-300" : "text-amber-300")}
-                  title={naturalVoice ? "Natural voice (ElevenLabs)" : voiceProblem ?? "Basic browser voice — add ELEVENLABS_API_KEY for a natural voice"}
+                  title={naturalVoice ? "Natural voice (ElevenLabs)" : voiceProblem ?? "Basic browser voice. Add ELEVENLABS_API_KEY for a natural voice"}
                 >
                   {naturalVoice ? "HD voice" : "Basic voice"}
                 </span>
@@ -520,7 +520,7 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
                       id="answer"
                       value={draft + (speech.interim ? (draft ? " " : "") + speech.interim : "")}
                       onChange={(e) => { setDraft(e.target.value); setTypedEdit(true); bump(); }}
-                      placeholder={handsFreeOn ? `Just talk to ${persona.firstName} — your words appear here. You can also type.` : speech.supported ? "Tap “Answer out loud” and speak — your words appear here. You can edit before sending." : "Type your answer…"}
+                      placeholder={handsFreeOn ? `Just talk to ${persona.firstName}. Your words appear here. You can also type.` : speech.supported ? "Tap “Answer out loud” and speak. Your words appear here. You can edit before sending." : "Type your answer…"}
                       className="min-h-[64px] w-full resize-none bg-transparent px-2 py-1.5 text-[15px] leading-relaxed text-white placeholder:text-ink-500 focus:outline-none"
                       onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit(); }}
                       disabled={submitting}
@@ -533,7 +533,7 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
                           </span>
                         ) : speech.supported ? (
                           <button type="button" onClick={() => (speech.listening ? speech.stop() : speech.start())} className={cn("flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium", speech.listening ? "bg-red-600 text-white" : "bg-white/10 text-white hover:bg-white/20")} aria-pressed={speech.listening}>
-                            {speech.listening ? <><span className="h-2 w-2 animate-pulse rounded-full bg-white" /> Listening — tap to stop</> : <><Mic className="h-4 w-4" /> Answer out loud</>}
+                            {speech.listening ? <><span className="h-2 w-2 animate-pulse rounded-full bg-white" /> Listening (tap to stop)</> : <><Mic className="h-4 w-4" /> Answer out loud</>}
                           </button>
                         ) : (
                           <span className="flex items-center gap-2 text-xs text-ink-400"><Keyboard className="h-4 w-4" /> Typing mode</span>

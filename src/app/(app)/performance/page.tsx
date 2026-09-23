@@ -27,10 +27,10 @@ export default async function PerformancePage() {
     <div className="space-y-6">
       <PageHeader eyebrow="Performance analytics" title="Your progress" description="Built only from your completed, AI-graded interviews." />
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4 xl:grid-cols-7">
-        <StatCard label="First Interview" value={s.first ?? "—"} />
-        <StatCard label="Latest Interview" value={s.latest ?? "—"} sub={s.first != null && s.latest != null ? `${s.latest - s.first >= 0 ? "+" : ""}${s.latest - s.first} since first` : undefined} />
-        <StatCard label="Highest Score" value={s.highest ?? "—"} />
-        <StatCard label="Average Score" value={s.average ?? "—"} />
+        <StatCard label="First Interview" value={s.first ?? "N/A"} />
+        <StatCard label="Latest Interview" value={s.latest ?? "N/A"} sub={s.first != null && s.latest != null ? `${s.latest - s.first >= 0 ? "+" : ""}${s.latest - s.first} since first` : undefined} />
+        <StatCard label="Highest Score" value={s.highest ?? "N/A"} />
+        <StatCard label="Average Score" value={s.average ?? "N/A"} />
         <StatCard label="Completed" value={s.count} />
         <StatCard label="AI Interviews" value={s.aiCount} />
         <StatCard label="Human Interviews" value={s.humanCount} />

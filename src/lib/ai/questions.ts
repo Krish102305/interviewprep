@@ -134,7 +134,7 @@ export function generateFromBank(ctx: InterviewContext): GeneratedQuestion[] {
   const highlight = resumeHighlights(ctx.resumeText, 1)[0];
   if (s.behavioral > 0 && highlight) {
     behavioral.push({
-      text: `On your resume you mention: "${highlight}". Walk me through that — what was your specific role, and what was the outcome?`,
+      text: `On your resume you mention: "${highlight}". Walk me through that. What was your specific role, and what was the outcome?`,
       category: "behavioral",
       difficulty: ctx.difficulty,
       whatItTests: "Depth and ownership of resume experience",
@@ -155,7 +155,7 @@ export function generateFromBank(ctx: InterviewContext): GeneratedQuestion[] {
   const skill = jobSkills(ctx.jobDescription, 1)[0];
   if (s.technical > 1 && skill) {
     technical.push({
-      text: `This role calls for ${skill}. Tell me about the most substantial thing you've done with ${skill} — what was the problem, your approach, and the result?`,
+      text: `This role calls for ${skill}. Tell me about the most substantial thing you've done with ${skill}? What was the problem, your approach, and the result?`,
       category: "role",
       difficulty: ctx.difficulty,
       whatItTests: `Hands-on depth with ${skill} (from the job description)`,
@@ -200,7 +200,7 @@ const QUESTION_SYSTEM = `You are the interview design engine for Interview Conne
 You design a complete, customized interview plan. The plan is used either by an AI interviewer or handed to a human interviewer as their interview guide; the candidate never sees the plan in advance.
 
 Principles:
-- Questions must sound like a real interviewer at a real company would ask them — natural spoken language, one question at a time, no multi-part lists.
+- Questions must sound like a real interviewer at a real company would ask them: natural spoken language, one question at a time, no multi-part lists.
 - Customize to the candidate: reference concrete items from their resume and the job description when it adds realism, but never invent facts about the candidate.
 - Match the role: e.g. investment banking → accounting, valuation, DCF, M&A; product management → product sense, metrics, prioritization, strategy; software engineering → algorithms, data structures, systems, coding approach; consulting → case structuring, market sizing, quantitative reasoning; marketing → strategy, consumer behavior, analytics.
 - Match the difficulty and the candidate's experience level.

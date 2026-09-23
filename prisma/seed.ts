@@ -1,11 +1,11 @@
 /**
  * Demo data for Interview Connect.
  *
- *   npm run db:seed        (run with the react-server condition — see package.json)
+ *   npm run db:seed        (run with the react-server condition, see package.json)
  *
  * All demo accounts use the password "demo1234". Past interviews are graded with
  * the platform's rule-based development rubric (engine = "fallback"), exactly as
- * they would be when no AI key is configured — nothing is hand-scored.
+ * they would be when no AI key is configured, nothing is hand-scored.
  */
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -157,7 +157,7 @@ async function main() {
   }
 
   // Maya's resume (real file in private storage + parsed text)
-  const resumeText = `MAYA RODRIGUEZ\nUniversity of Michigan — B.A. Economics, minor in Computer Science (2026)\n\nEXPERIENCE\nSummer Analyst, Great Lakes Regional Bank\n• Built an automated variance-analysis tracker in Excel/VBA that cut quarter-end review time by 30%\n• Analyzed loan portfolio performance across 4 business lines and presented findings to the CFO\n\nTreasurer, Michigan Finance Club\n• Led a rebuild of member programming, growing event attendance from 15 to 48 members\n• Organized a 6-week mock superday series with 2 alumni partners\n\nPROJECTS\n• Developed a DCF model for a mid-cap retailer as part of a student investment fund pitch\n\nSKILLS\nExcel, financial modeling, valuation, SQL, Python, PowerPoint`;
+  const resumeText = `MAYA RODRIGUEZ\nUniversity of Michigan, B.A. Economics, minor in Computer Science (2026)\n\nEXPERIENCE\nSummer Analyst, Great Lakes Regional Bank\n• Built an automated variance-analysis tracker in Excel/VBA that cut quarter-end review time by 30%\n• Analyzed loan portfolio performance across 4 business lines and presented findings to the CFO\n\nTreasurer, Michigan Finance Club\n• Led a rebuild of member programming, growing event attendance from 15 to 48 members\n• Organized a 6-week mock superday series with 2 alumni partners\n\nPROJECTS\n• Developed a DCF model for a mid-cap retailer as part of a student investment fund pitch\n\nSKILLS\nExcel, financial modeling, valuation, SQL, Python, PowerPoint`;
   const storageDir = path.resolve(process.env.STORAGE_DIR || path.join(process.cwd(), "storage"), "resumes");
   await fs.mkdir(storageDir, { recursive: true });
   const resumeFile = `${crypto.randomUUID()}.txt`;
@@ -172,7 +172,7 @@ async function main() {
     { student: "maya", mode: "ai", type: "technical", role: "Investment Banking Analyst", company: "Evercore", difficulty: "intermediate", duration: 30, daysAgo: 29, quality: 0.5 },
     { student: "maya", mode: "human", type: "behavioral", role: "Investment Banking Analyst", company: "Goldman Sachs", difficulty: "intermediate", duration: 30, daysAgo: 24, quality: 0.62, interviewer: "chris", feedback: ["Good energy and a clear story about the finance club turnaround.", "Quantify the results earlier and slow down when explaining your role."], rating: [5, 4, 5, 4, "Felt like a real first round."] },
     { student: "maya", mode: "ai", type: "full", role: "Product Manager Intern", company: "Stripe", difficulty: "intermediate", duration: 45, daysAgo: 18, quality: 0.68 },
-    { student: "maya", mode: "human", type: "technical", role: "Investment Banking Analyst", company: "Goldman Sachs", difficulty: "advanced", duration: 45, daysAgo: 12, quality: 0.74, interviewer: "marcus", feedback: ["Solid walk-through of the three statements and the DCF.", "Accretion/dilution was shaky — drill the all-stock rule of thumb."], rating: [5, 5, 4, 5, "Tough but fair. Exactly what I needed."] },
+    { student: "maya", mode: "human", type: "technical", role: "Investment Banking Analyst", company: "Goldman Sachs", difficulty: "advanced", duration: 45, daysAgo: 12, quality: 0.74, interviewer: "marcus", feedback: ["Solid walk-through of the three statements and the DCF.", "Accretion/dilution was shaky, drill the all-stock rule of thumb."], rating: [5, 5, 4, 5, "Tough but fair. Exactly what I needed."] },
     { student: "maya", mode: "ai", type: "behavioral", role: "Investment Banking Analyst", company: "Evercore", difficulty: "advanced", duration: 30, daysAgo: 6, quality: 0.86 },
     { student: "maya", mode: "human", type: "full", role: "Product Manager Intern", company: "Stripe", difficulty: "intermediate", duration: 45, daysAgo: 3, quality: 0.9, interviewer: "priya", feedback: ["Excellent structure and very specific metrics in every story.", "On product sense, spend a bit more time on user segments before jumping to solutions."], rating: [5, 5, 5, 5, "Priya's feedback was incredibly specific."] },
     { student: "maya", mode: "ai", type: "technical", role: "Investment Banking Analyst", company: "Evercore", difficulty: "advanced", duration: 30, daysAgo: 1, quality: 0.83 },
@@ -239,7 +239,7 @@ async function main() {
         summary: ev.summary, strengths: JSON.stringify(ev.strengths), improvements: JSON.stringify(ev.improvements), questionFeedback: JSON.stringify(ev.questionFeedback),
         recommendation: JSON.stringify(
           p.quality > 0.8
-            ? { title: "Add real interview pressure", detail: "You're scoring well — keep stretching with advanced human interviews.", mode: "human", type: "full" }
+            ? { title: "Add real interview pressure", detail: "You're scoring well. Keep stretching with advanced human interviews.", mode: "human", type: "full" }
             : { title: "Practice STAR-structured stories", detail: "End every story with a specific, measurable result.", mode: "ai", type: "behavioral" },
         ),
         interviewerFeedbackSummary: ev.interviewerFeedbackSummary, createdAt: completed,
@@ -340,18 +340,18 @@ async function main() {
     return db.strike.create({ data: { userId, strikeNumber: n, interviewId, reportId: report.id, reason, description, evidence: report.evidence, reviewerId: admin.id, createdAt: ago(daysAgo - 0.5) } });
   }
 
-  // Jordan — 1 strike
+  // Jordan, 1 strike
   await confirmedStrike(students.jordan.id, 1, "left_interview", "Candidate left the interview room for approximately 8 minutes without explanation and did not return.", created.jordan[1], interviewers.devon.id, 9);
-  await db.notification.create({ data: { userId: students.jordan.id, type: "strike_received", title: "Interview Conduct Warning — 1 / 3 strikes", body: "You have received your first confirmed conduct strike (Left Interview). Future confirmed violations can result in additional strikes.", link: "/conduct", createdAt: ago(8.5) } });
+  await db.notification.create({ data: { userId: students.jordan.id, type: "strike_received", title: "Interview Conduct Warning (1 / 3 strikes)", body: "You have received your first confirmed conduct strike (Left Interview). Future confirmed violations can result in additional strikes.", link: "/conduct", createdAt: ago(8.5) } });
 
-  // Alex — 2 strikes, appeal pending on #2
+  // Alex, 2 strikes, appeal pending on #2
   await confirmedStrike(students.alex.id, 1, "inactivity", "Unresponsive for an extended period during an AI interview after two conduct warnings.", created.alex[0], null, 21);
   const alex2 = await confirmedStrike(students.alex.id, 2, "refused", "Candidate repeatedly refused to answer questions and said they were 'just clicking through'.", created.alex[1], interviewers.marcus.id, 14);
   await db.appeal.create({ data: { strikeId: alex2.id, userId: students.alex.id, reason: "I was dealing with a family emergency", description: "I got an urgent call from home during the interview and couldn't focus. I should have said so, but I wasn't intentionally refusing to participate.", submittedAt: ago(12) } });
   await db.conductReport.update({ where: { id: alex2.reportId! }, data: { status: "appealed" } });
-  await db.notification.create({ data: { userId: students.alex.id, type: "strike_received", title: "Final Warning — 2 / 3 strikes", body: "You currently have 2 / 3 confirmed strikes. One additional confirmed conduct violation will result in an account ban from Interview Connect interviews.", link: "/conduct", createdAt: ago(13.5) } });
+  await db.notification.create({ data: { userId: students.alex.id, type: "strike_received", title: "Final Warning (2 / 3 strikes)", body: "You currently have 2 / 3 confirmed strikes. One additional confirmed conduct violation will result in an account ban from Interview Connect interviews.", link: "/conduct", createdAt: ago(13.5) } });
 
-  // Sam — 3 strikes, banned, appeal pending on #3
+  // Sam, 3 strikes, banned, appeal pending on #3
   await confirmedStrike(students.sam.id, 1, "disrespectful", "Made insulting comments to the interviewer about their background.", null, interviewers.elena.id, 28);
   await confirmedStrike(students.sam.id, 2, "disruptive", "Played loud music and ignored repeated requests to stop.", null, interviewers.chris.id, 20);
   const sam3 = await confirmedStrike(students.sam.id, 3, "platform_abuse", "Created fake interview requests and no-showed to harass interviewers.", null, interviewers.priya.id, 10);
@@ -360,16 +360,16 @@ async function main() {
   await db.adminAction.create({ data: { adminId: admin.id, action: "ban", targetUserId: students.sam.id, details: "3 confirmed conduct violations", createdAt: ago(9.5) } });
   await db.notification.create({ data: { userId: students.sam.id, type: "account_suspended", title: "Account suspended", body: "Your Interview Connect account has been suspended after 3 confirmed conduct violations. You can review your strike history and submit an appeal.", link: "/conduct", createdAt: ago(9.5) } });
 
-  // Devon (interviewer) — 1 strike; plus a pending report for admins to review
+  // Devon (interviewer), 1 strike; plus a pending report for admins to review
   await confirmedStrike(interviewers.devon.id, 1, "left_interview", "Interviewer ended a scheduled interview after 5 minutes without explanation.", null, null, 16);
   await db.conductReport.create({
     data: {
       userId: interviewers.devon.id, interviewId: created.jordan[1], reportedById: students.jordan.id, source: "participant", reason: "disrespectful", status: "pending", createdAt: ago(1),
-      description: "The interviewer made dismissive comments about my school and said I'd 'never get into Google' — it felt unprofessional.",
+      description: "The interviewer made dismissive comments about my school and said I'd 'never get into Google'. It felt unprofessional.",
       evidence: JSON.stringify({ conductEvents: [], technicalEvents: [{ type: "connection_lost", details: "Peer connection disconnected", at: ago(9) }] }),
     },
   });
-  // System-generated pending report for Taylor (repeated ignored warnings) — shows AI can only flag.
+  // System-generated pending report for Taylor (repeated ignored warnings), shows AI can only flag.
   await db.conductReport.create({
     data: {
       userId: students.taylor.id, interviewId: created.taylor[0], reportedById: null, source: "system", reason: "inactivity", status: "pending", createdAt: ago(0.5),

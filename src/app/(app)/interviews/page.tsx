@@ -52,7 +52,7 @@ export default async function InterviewsPage({ searchParams }: { searchParams: P
           isStudent ? <InterviewList rows={rows} timeZone={user.profile?.timezone} /> : <InterviewList rows={rows.map((r) => ({ ...r, interviewerName: r.studentName ?? null }))} viewer="interviewer" showScore={false} timeZone={user.profile?.timezone} />
         ) : (
           <div className="p-6">
-            <EmptyState title={filter === "all" ? "No interviews yet" : `No ${LABELS.type[filter]?.toLowerCase() ?? filter} interviews`} description={isStudent ? "Start your first interview — AI or human — to see it here." : "Accept a request or open availability to get matched."} action={isStudent ? <ButtonLink href="/interviews/new" size="sm">Find an Interview</ButtonLink> : <ButtonLink href="/interviewer/availability" size="sm">Set availability</ButtonLink>} />
+            <EmptyState title={filter === "all" ? "No interviews yet" : `No ${LABELS.type[filter]?.toLowerCase() ?? filter} interviews`} description={isStudent ? "Start your first interview (AI or human) to see it here." : "Accept a request or open availability to get matched."} action={isStudent ? <ButtonLink href="/interviews/new" size="sm">Find an Interview</ButtonLink> : <ButtonLink href="/interviewer/availability" size="sm">Set availability</ButtonLink>} />
           </div>
         )}
       </Card>

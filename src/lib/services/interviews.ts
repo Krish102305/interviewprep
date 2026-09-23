@@ -185,7 +185,7 @@ export async function sweepStaleInterviews() {
   for (const iv of lateHuman) {
     const joined = new Set(iv.sessions.filter((s) => s.joinedAt || s.ready).map((s) => s.userId));
     const noShows = [iv.studentId, iv.interviewerId!].filter((id) => !joined.has(id));
-    if (!noShows.length) continue; // both showed up (e.g. still waiting on the guide) — not a no-show
+    if (!noShows.length) continue; // both showed up (e.g. still waiting on the guide), not a no-show
     await db.interview.update({ where: { id: iv.id }, data: { status: "no_show", noShowUserIds: JSON.stringify(noShows) } });
     await track("interview_no_show", null, { count: noShows.length });
     for (const uid of [iv.studentId, iv.interviewerId!]) {
@@ -196,7 +196,7 @@ export async function sweepStaleInterviews() {
         missed ? "Missed interview recorded" : "Your interview partner didn't show",
         missed
           ? "You didn't join a scheduled interview. No-shows are tracked separately from conduct strikes, but repeated no-shows may be reviewed."
-          : "Sorry about that — it wasn't counted against you. Schedule another interview any time.",
+          : "Sorry about that. It wasn't counted against you. Schedule another interview any time.",
         `/interviews/${iv.id}`,
       );
     }

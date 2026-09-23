@@ -25,7 +25,7 @@ export default async function AdminInterviewers() {
             <tbody>
               {list.map((p) => {
                 const r = ratings.find((x) => x.interviewerId === p.userId);
-                const avg = r ? (((r._avg.professionalism ?? 0) + (r._avg.realism ?? 0) + (r._avg.communication ?? 0) + (r._avg.feedbackQuality ?? 0)) / 4).toFixed(1) : "—";
+                const avg = r ? (((r._avg.professionalism ?? 0) + (r._avg.realism ?? 0) + (r._avg.communication ?? 0) + (r._avg.feedbackQuality ?? 0)) / 4).toFixed(1) : "N/A";
                 return (
                   <tr key={p.id} className="border-b border-ink-100 last:border-0">
                     <td className="px-5 py-3"><Link href={`/admin/users/${p.userId}`} className="font-medium hover:underline">{fullName(p.user.profile)}</Link><p className="text-xs text-ink-500">{p.user.email}</p></td>

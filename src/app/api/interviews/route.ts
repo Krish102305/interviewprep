@@ -9,7 +9,7 @@ export const POST = route(
     const user = await requireApiUser({ roles: ["student"] });
     const input = await readJson(req, createInterviewSchema);
     const interview = await createInterview(user, input);
-    // Question generation can take a while with a real model — do it after responding.
+    // Question generation can take a while with a real model, do it after responding.
     after(() => generateQuestionsFor(interview.id));
     const next = input.mode === "ai" && input.timing === "now" ? `/interviews/${interview.id}/room` : `/interviews/${interview.id}`;
     return { id: interview.id, redirect: next };

@@ -19,7 +19,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
   const myLevel = levelFor(mine);
   return (
     <div className="mx-auto max-w-4xl">
-      <PageHeader eyebrow="Gamification" title="Leaderboard" description="Points come from completing interviews, improving, keeping streaks and — for interviewers — conducting interviews and giving great feedback." />
+      <PageHeader eyebrow="Gamification" title="Leaderboard" description="Points come from completing interviews, improving, keeping streaks and, for interviewers, conducting interviews and giving great feedback." />
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <nav className="flex gap-1.5" aria-label="Leaderboard type">
           {(["student", "interviewer"] as const).map((b) => (

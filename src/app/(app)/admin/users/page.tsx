@@ -61,7 +61,7 @@ export default async function AdminUsers({ searchParams }: { searchParams: Promi
                   <td className="px-5 py-3"><Link href={`/admin/users/${u.id}`} className="font-medium text-ink-900 hover:underline">{fullName(u.profile)}</Link></td>
                   <td className="py-3 pr-4 text-ink-600">{u.email}</td>
                   <td className="py-3 pr-4 capitalize">{u.role}</td>
-                  <td className="py-3 pr-4 text-ink-600">{u.studentProfile?.school ?? "—"}</td>
+                  <td className="py-3 pr-4 text-ink-600">{u.studentProfile?.school ?? "N/A"}</td>
                   <td className="py-3 pr-4 tabular-nums">{u._count.interviewsAsStudent + u._count.interviewsAsInterviewer}</td>
                   <td className="py-3 pr-4 tabular-nums">{u._count.strikes} / 3</td>
                   <td className="py-3 pr-4"><Badge tone={u.accountStatus === "active" ? "success" : toneForStatus(u.accountStatus)}>{u.accountStatus}</Badge></td>

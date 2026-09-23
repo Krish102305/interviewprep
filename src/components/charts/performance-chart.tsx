@@ -65,7 +65,7 @@ export function PerformanceChart({ data, defaultSeries = ["overall"], height = 2
                 <tr key={r.id} className="border-b border-ink-100">
                   <td className="py-2 pr-4 text-ink-600">{r.label}</td>
                   <td className="py-2 pr-4 text-ink-800">{r.role} · {LABELS.mode[r.mode]} · {LABELS.type[r.type]}</td>
-                  {shown.map((s) => <td key={s.key} className="py-2 pr-4 text-right tabular-nums text-ink-900">{r[s.key] ?? "—"}</td>)}
+                  {shown.map((s) => <td key={s.key} className="py-2 pr-4 text-right tabular-nums text-ink-900">{r[s.key] ?? "N/A"}</td>)}
                 </tr>
               ))}
             </tbody>
@@ -90,7 +90,7 @@ export function PerformanceChart({ data, defaultSeries = ["overall"], height = 2
                       {shown.map((s) => (
                         <p key={s.key} className="flex items-center justify-between gap-4 text-ink-700">
                           <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: s.color }} />{s.label}</span>
-                          <span className="font-semibold tabular-nums text-ink-900">{p[s.key] ?? "—"}</span>
+                          <span className="font-semibold tabular-nums text-ink-900">{p[s.key] ?? "N/A"}</span>
                         </p>
                       ))}
                     </div>

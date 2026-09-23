@@ -37,7 +37,7 @@ export function MarketingFooter() {
       <div className="container-page flex flex-col gap-6 py-10 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <Logo />
-          <p className="mt-2 max-w-sm text-sm text-ink-500">Realistic interview practice with AI and real people — graded consistently by AI.</p>
+          <p className="mt-2 max-w-sm text-sm text-ink-500">Realistic interview practice with AI and real people, graded consistently by AI.</p>
         </div>
         <nav aria-label="Footer" className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-ink-600">
           <Link href="/signup" className="hover:text-ink-950">Start practicing</Link>

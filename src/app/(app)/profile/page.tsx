@@ -32,7 +32,7 @@ export default async function ProfilePage() {
   const isStudent = user.role === "student";
   const perf = isStudent ? await getPerformance(user.id) : null;
   const ratings = !isStudent ? await db.interviewerRating.findMany({ where: { interviewerId: user.id, moderationStatus: "visible" } }) : [];
-  const avgRating = ratings.length ? (ratings.reduce((s, r) => s + (r.professionalism + r.realism + r.communication + r.feedbackQuality) / 4, 0) / ratings.length).toFixed(1) : "—";
+  const avgRating = ratings.length ? (ratings.reduce((s, r) => s + (r.professionalism + r.realism + r.communication + r.feedbackQuality) / 4, 0) / ratings.length).toFixed(1) : "N/A";
   const conducted = !isStudent ? await db.interview.count({ where: { interviewerId: user.id, status: "completed" } }) : 0;
   const openSlots = !isStudent ? await db.availability.count({ where: { interviewerId: user.id, interviewId: null, startsAt: { gte: new Date() } } }) : 0;
   const earnedKeys = new Set(earned.map((e) => e.badge.key));
@@ -65,14 +65,14 @@ export default async function ProfilePage() {
         {isStudent ? (
           <>
             <StatCard label="Interviews graded" value={perf?.summary.count ?? 0} />
-            <StatCard label="Average score" value={perf?.summary.average ?? "—"} />
-            <StatCard label="Best score" value={perf?.summary.highest ?? "—"} />
+            <StatCard label="Average score" value={perf?.summary.average ?? "N/A"} />
+            <StatCard label="Best score" value={perf?.summary.highest ?? "N/A"} />
             <StatCard label="Current streak" value={`${sp?.currentStreak ?? 0} days`} sub={`Longest ${sp?.longestStreak ?? 0} days`} />
           </>
         ) : (
           <>
             <StatCard label="Interviews conducted" value={conducted} />
-            <StatCard label="Average rating" value={avgRating === "—" ? "—" : `${avgRating} / 5`} sub={`${ratings.length} ratings`} />
+            <StatCard label="Average rating" value={avgRating === "N/A" ? "N/A" : `${avgRating} / 5`} sub={`${ratings.length} ratings`} />
             <StatCard label="Experience" value={`${ip?.yearsExperience ?? 0} yrs`} />
             <StatCard label="Open slots" value={openSlots} />
           </>
@@ -89,7 +89,7 @@ export default async function ProfilePage() {
                   <div><dt className="text-xs text-ink-500">Target roles</dt><dd className="mt-1 flex flex-wrap gap-1">{parseJsonArray(sp.targetRoles).map((r) => <Badge key={r}>{r}</Badge>)}</dd></div>
                   <div><dt className="text-xs text-ink-500">Industry</dt><dd className="mt-1 font-medium">{sp.targetIndustry}</dd></div>
                   <div><dt className="text-xs text-ink-500">Experience</dt><dd className="mt-1 font-medium">{EXPERIENCE_LEVELS.find((l) => l.value === sp.experienceLevel)?.label}</dd></div>
-                  <div><dt className="text-xs text-ink-500">Companies</dt><dd className="mt-1 text-ink-700">{parseJsonArray(sp.companies).join(", ") || "—"}</dd></div>
+                  <div><dt className="text-xs text-ink-500">Companies</dt><dd className="mt-1 text-ink-700">{parseJsonArray(sp.companies).join(", ") || "N/A"}</dd></div>
                   <div><dt className="text-xs text-ink-500">Practicing</dt><dd className="mt-1 text-ink-700">{parseJsonArray(sp.interviewPreferences).map((t) => LABELS.type[t]).join(", ")}</dd></div>
                   <div><dt className="text-xs text-ink-500">Member since</dt><dd className="mt-1 text-ink-700">{formatDate(user.createdAt)}</dd></div>
                 </dl>

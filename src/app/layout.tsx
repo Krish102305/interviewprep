@@ -3,9 +3,9 @@ import "./globals.css";
 import { ToastProvider } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
-  title: { default: "Interview Connect — Practice like it's the real interview", template: "%s · Interview Connect" },
+  title: { default: "Interview Connect: Practice like it's the real interview", template: "%s · Interview Connect" },
   description:
-    "Interview Connect combines AI-powered preparation with real interview experiences — AI and human interviewers, standardized AI grading and personalized feedback.",
+    "Interview Connect combines AI-powered preparation with real interview experiences: AI and human interviewers, standardized AI grading and personalized feedback.",
 };
 
 export const viewport: Viewport = { themeColor: "#18191B", width: "device-width", initialScale: 1 };

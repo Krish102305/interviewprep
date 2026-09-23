@@ -27,7 +27,7 @@ export default async function AdminStrikes() {
                   <td className="px-5 py-3"><Link href={`/admin/users/${s.user.id}`} className="font-medium hover:underline">{fullName(s.user.profile)}</Link>{s.user.accountStatus === "banned" && <Badge tone="danger" className="ml-2">banned</Badge>}</td>
                   <td className="py-3 pr-4 tabular-nums">{s.strikeNumber}</td>
                   <td className="py-3 pr-4"><p>{conductReasonLabel(s.reason)}</p><p className="max-w-xs truncate text-xs text-ink-500" title={s.description}>{s.description}</p></td>
-                  <td className="py-3 pr-4">{s.interview ? <Link href={`/admin/interviews/${s.interview.id}`} className="hover:underline">{s.interview.targetRole}</Link> : "—"}</td>
+                  <td className="py-3 pr-4">{s.interview ? <Link href={`/admin/interviews/${s.interview.id}`} className="hover:underline">{s.interview.targetRole}</Link> : "N/A"}</td>
                   <td className="py-3 pr-4 text-ink-600">{fullName(s.reviewer?.profile)}</td>
                   <td className="py-3 pr-4 text-ink-500">{formatDate(s.createdAt)}</td>
                   <td className="py-3 pr-4"><Badge tone={s.status === "active" ? "danger" : "success"}>{s.status}</Badge></td>

@@ -6,7 +6,7 @@ export type ClientRoomState = Omit<RoomState, "startedAt" | "pausedAt" | "schedu
 
 /**
  * Polls the role-filtered room state. Tracks consecutive failures so the UI can
- * show "Connection interrupted — trying to reconnect…" and log a technical event
+ * show "Connection interrupted, trying to reconnect…" and log a technical event
  * (never a conduct event) once we recover.
  */
 export function useRoomState(id: string, intervalMs = 2000) {

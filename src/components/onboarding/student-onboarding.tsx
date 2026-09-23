@@ -100,10 +100,10 @@ export function StudentOnboarding({ initial, existingResume }: { initial: Initia
           )}
           {step === 2 && (
             <>
-              <p className="text-sm text-ink-600">Your resume lets the AI ask about your real experience. It&apos;s stored privately — only you, and an interviewer you&apos;re matched with, can view it.</p>
+              <p className="text-sm text-ink-600">Your resume lets the AI ask about your real experience. It&apos;s stored privately. Only you and an interviewer you&apos;re matched with can view it.</p>
               {resume ? (
                 <Alert tone="success" title="Resume uploaded" action={<Button size="sm" variant="secondary" onClick={() => setResume(null)}>Replace</Button>}>
-                  {resume.fileName}{resume.parsed ? " — parsed for question customization." : " — we couldn't read text from it."}
+                  {resume.fileName}{resume.parsed ? ": parsed for question customization." : ": we couldn't read text from it."}
                 </Alert>
               ) : (
                 <ResumeUploader onUploaded={setResume} />

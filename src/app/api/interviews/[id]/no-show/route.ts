@@ -8,7 +8,7 @@ import { track } from "@/lib/services/analytics";
 
 /**
  * The participant who showed up can record a no-show 10 minutes after the start
- * time. No-shows are tracked separately — never an automatic strike.
+ * time. No-shows are tracked separately, never an automatic strike.
  */
 export const POST = route<{ id: string }>(async (_req, { params }) => {
   const user = await requireApiUser();

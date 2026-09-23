@@ -5,7 +5,7 @@ import { standing } from "@/lib/services/conduct";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/cn";
 
-/** Conduct status with icon + label + meter — never color alone. */
+/** Conduct status with icon + label + meter, never color alone. */
 export function StandingCard({ strikes, accountStatus, className }: { strikes: number; accountStatus: string; className?: string }) {
   const s = standing(strikes, accountStatus);
   const Icon = s.key === "good" ? ShieldCheck : s.key === "banned" ? ShieldX : ShieldAlert;

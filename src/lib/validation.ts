@@ -30,7 +30,7 @@ export const signupSchema = z.object({
     .regex(/[0-9]/, "Password must contain a number"),
   firstName: requiredText("First name", 60),
   lastName: trimmed(60).default(""),
-  // Only student/interviewer are accepted — admin can never be requested.
+  // Only student/interviewer are accepted, admin can never be requested.
   role: enumOf(SIGNUP_ROLES),
 });
 

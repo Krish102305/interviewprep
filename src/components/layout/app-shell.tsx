@@ -71,7 +71,7 @@ export async function AppShell({ user, children }: { user: SessionUser; children
           </div>
           <div className="hidden text-xs text-ink-500 lg:block">
             {user.accountStatus !== "active" ? (
-              <span className="font-medium text-red-700">Account {user.accountStatus} — interview features are disabled</span>
+              <span className="font-medium text-red-700">Account {user.accountStatus}: interview features are disabled</span>
             ) : (
               <span>{roleLabel} workspace</span>
             )}

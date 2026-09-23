@@ -87,7 +87,7 @@ export default async function AdminUserDetail({ params }: { params: Promise<{ id
               <dl className="grid grid-cols-2 gap-3">
                 <div><dt className="text-xs text-ink-500">Title</dt><dd>{u.interviewerProfile.title}</dd></div>
                 <div><dt className="text-xs text-ink-500">Type</dt><dd>{LABELS.interviewerType[u.interviewerProfile.interviewerType]}</dd></div>
-                <div><dt className="text-xs text-ink-500">Company</dt><dd>{u.interviewerProfile.company ?? "—"}</dd></div>
+                <div><dt className="text-xs text-ink-500">Company</dt><dd>{u.interviewerProfile.company ?? "N/A"}</dd></div>
                 <div><dt className="text-xs text-ink-500">Experience</dt><dd>{u.interviewerProfile.yearsExperience} yrs</dd></div>
               </dl>
             )}

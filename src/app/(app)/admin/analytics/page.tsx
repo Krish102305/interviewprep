@@ -36,7 +36,7 @@ export default async function AdminAnalytics() {
   const top = Math.max(1, ...funnel.map(([, v]) => v));
   return (
     <div className="space-y-6">
-      <PageHeader eyebrow="Admin" title="Analytics" description="Last 30 days. Only event names and ids are stored — no free-text personal data." />
+      <PageHeader eyebrow="Admin" title="Analytics" description="Last 30 days. Only event names and ids are stored, never free-text personal data." />
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Signups (30d)" value={c("signup")} />
         <StatCard label="Interviews completed (30d)" value={c("interview_completed")} />

@@ -68,7 +68,7 @@ export async function getPerformance(userId: string) {
 }
 
 /**
- * What to practice next — derived from the student's actual history plus the
+ * What to practice next, derived from the student's actual history plus the
  * interview that was just graded (spec §33).
  */
 export async function recommendNext(
@@ -130,10 +130,10 @@ export async function recommendNext(
       behavioral: { title: "Practice behavioral questions focused on leadership", detail: "Behavioral performance was your weakest area. Prepare 4–5 stories (leadership, conflict, failure, initiative) and rehearse them.", mode: "ai", type: "behavioral", focus: "leadership" },
       technicalKnowledge: { title: "Drill role-specific technical questions", detail: "Technical knowledge was your lowest category. A technical interview at the same difficulty will target the gaps.", mode: "ai", type: "technical" },
       roleKnowledge: { title: "Deepen your role knowledge", detail: "Research the role's day-to-day and practice a technical interview with the job description attached.", mode: "ai", type: "technical" },
-      communication: { title: "Work on concise communication", detail: "Communication was your lowest category. Aim for 1–2 minute answers with a clear beginning, middle and end — a full interview is great practice.", mode: "ai", type: "full", focus: "communication" },
-      confidence: { title: "Build confidence under pressure", detail: "Confidence was your weakest score. Practicing with a real person is the best way to get comfortable — try a human interview.", mode: "human", type: (latest?.type as Recommendation["type"]) ?? "behavioral" },
+      communication: { title: "Work on concise communication", detail: "Communication was your lowest category. Aim for 1–2 minute answers with a clear beginning, middle and end. A full interview is great practice.", mode: "ai", type: "full", focus: "communication" },
+      confidence: { title: "Build confidence under pressure", detail: "Confidence was your weakest score. Practicing with a real person is the best way to get comfortable. Try a human interview.", mode: "human", type: (latest?.type as Recommendation["type"]) ?? "behavioral" },
       problemSolving: { title: "Practice thinking out loud", detail: "Problem solving scored lowest. Narrate your approach step by step in a technical interview.", mode: "ai", type: "technical" },
-      professionalism: { title: "Polish your interview presence", detail: "Professionalism scored lowest — keep answers focused and complete. A human interview will give you real-world feedback.", mode: "human", type: "full" },
+      professionalism: { title: "Polish your interview presence", detail: "Professionalism scored lowest. Keep answers focused and complete. A human interview will give you real-world feedback.", mode: "human", type: "full" },
     };
     const rec = focusMap[weakest.key];
     if (rec) return { ...rec, detail: `${rec.detail} (${weakest.label}: ${weakest.v}/100)` };
@@ -145,7 +145,7 @@ export async function recommendNext(
     const weaker = bt < tt ? "behavioral" : "technical";
     return { title: `Focus on ${weaker} interviews`, detail: `Your ${weaker} average (${Math.min(bt, tt)}) trails your ${weaker === "behavioral" ? "technical" : "behavioral"} average (${Math.max(bt, tt)}).`, mode: "ai", type: weaker };
   }
-  return { title: "Keep the momentum with a full interview", detail: "A full interview combines everything you've practiced — the closest thing to the real day.", mode: humanCount ? "ai" : "human", type: "full" };
+  return { title: "Keep the momentum with a full interview", detail: "A full interview combines everything you've practiced: the closest thing to the real day.", mode: humanCount ? "ai" : "human", type: "full" };
 }
 
 export function parseRecommendation(value: string | null | undefined): Recommendation | null {

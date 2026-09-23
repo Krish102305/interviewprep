@@ -44,7 +44,7 @@ export async function notify(
     const user = await db.user.findUnique({ where: { id: userId }, select: { email: true } });
     if (user) {
       const url = link ? `${process.env.APP_URL ?? "http://localhost:3000"}${link}` : "";
-      void sendEmail(user.email, `Interview Connect — ${title}`, `${body}${url ? `\n\n${url}` : ""}`);
+      void sendEmail(user.email, `Interview Connect: ${title}`, `${body}${url ? `\n\n${url}` : ""}`);
     }
   }
   return n;

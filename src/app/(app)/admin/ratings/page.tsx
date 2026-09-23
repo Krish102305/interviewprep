@@ -25,7 +25,7 @@ export default async function AdminRatings() {
                   <td className="px-5 py-3 font-medium">{fullName(r.interviewer.profile)}</td>
                   <td className="py-3 pr-4 text-ink-600">{fullName(r.student.profile)}</td>
                   <td className="py-3 pr-4 tabular-nums">{r.professionalism} / {r.realism} / {r.communication} / {r.feedbackQuality}</td>
-                  <td className="max-w-xs py-3 pr-4 text-ink-600">{r.comment ?? "—"}</td>
+                  <td className="max-w-xs py-3 pr-4 text-ink-600">{r.comment ?? "N/A"}</td>
                   <td className="py-3 pr-4 text-ink-500">{formatDate(r.createdAt)}</td>
                   <td className="py-3 pr-5 text-right">{r.moderationStatus === "hidden" && <Badge tone="warning" className="mr-2">hidden</Badge>}<RatingToggle id={r.id} hidden={r.moderationStatus === "hidden"} /></td>
                 </tr>

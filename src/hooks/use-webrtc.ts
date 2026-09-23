@@ -58,7 +58,7 @@ export function useWebRTC({ interviewId, localStream, polite, enabled }: { inter
         post(`/api/interviews/${interviewId}/connection`, { state: "reconnecting" });
       } else if (s === "failed") {
         setPeerState("reconnecting");
-        logTech("ice_failed", "Peer connection failed — restarting ICE");
+        logTech("ice_failed", "Peer connection failed, restarting ICE");
         pc.restartIce();
       }
       if (s === "connected") post(`/api/interviews/${interviewId}/connection`, { state: "connected" });

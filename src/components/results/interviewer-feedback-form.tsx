@@ -15,7 +15,7 @@ export function InterviewerFeedbackForm({ interviewId }: { interviewId: string }
     setBusy(skip ? "skip" : "submit");
     try {
       await api(`/api/interviews/${interviewId}/feedback`, { body: { ...f, skip } });
-      toast.success(skip ? "Done — the AI is grading the interview now." : "Feedback submitted. It will be included in the candidate's AI report.");
+      toast.success(skip ? "Done. The AI is grading the interview now." : "Feedback submitted. It will be included in the candidate's AI report.");
       router.refresh();
     } catch (e) {
       toast.error((e as Error).message);

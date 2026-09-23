@@ -142,7 +142,7 @@ export function NewInterviewWizard(props: {
           <section aria-labelledby="q-what">
             <h2 id="q-what" className="text-2xl font-semibold">What type of interview?</h2>
             <div role="radiogroup" aria-labelledby="q-what" className="mt-6 grid gap-4 md:grid-cols-3">
-              <ChoiceCard name="type" selected={type === "behavioral"} onSelect={() => setType("behavioral")} icon={<MessagesSquare className="h-5 w-5" />} title="BEHAVIORAL" description="Leadership, teamwork, conflict, failure and motivation — STAR stories." />
+              <ChoiceCard name="type" selected={type === "behavioral"} onSelect={() => setType("behavioral")} icon={<MessagesSquare className="h-5 w-5" />} title="BEHAVIORAL" description="Leadership, teamwork, conflict, failure and motivation (STAR stories)." />
               <ChoiceCard name="type" selected={type === "technical"} onSelect={() => setType("technical")} icon={<Brain className="h-5 w-5" />} title="TECHNICAL" description="Role-specific questions: finance, product, coding, cases, marketing." />
               <ChoiceCard name="type" selected={type === "full"} onSelect={() => setType("full")} icon={<Layers className="h-5 w-5" />} title="FULL INTERVIEW" description="A realistic end-to-end interview: intro, behavioral, technical, your questions." />
             </div>
@@ -176,7 +176,7 @@ export function NewInterviewWizard(props: {
                 </button>
                 <input ref={jdFile} type="file" className="sr-only" accept=".pdf,.docx,.txt" aria-label="Upload job description file" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadJd(f); }} />
               </div>
-              <Textarea id="jd" value={jd} onChange={(e) => setJd(e.target.value)} placeholder="Paste the job description — the AI will tailor questions to the skills it asks for." className="min-h-[140px]" maxLength={20000} />
+              <Textarea id="jd" value={jd} onChange={(e) => setJd(e.target.value)} placeholder="Paste the job description and the AI will tailor questions to the skills it asks for." className="min-h-[140px]" maxLength={20000} />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-ink-800">Resume</p>
@@ -233,7 +233,7 @@ export function NewInterviewWizard(props: {
                 <legend className="mb-3 text-sm font-medium text-ink-800">Who should interview you?</legend>
                 <div role="radiogroup" className="grid gap-3 sm:grid-cols-3">
                   <ChoiceCard name="pref" selected={preference === "anyone"} onSelect={() => setPreference("anyone")} icon={<Shuffle className="h-5 w-5" />} title="Anyone" description="We'll find an appropriate available interviewer." />
-                  <ChoiceCard name="pref" selected={preference === "student"} onSelect={() => setPreference("student")} title="Another student" description="Peer practice — great for early rounds." />
+                  <ChoiceCard name="pref" selected={preference === "student"} onSelect={() => setPreference("student")} title="Another student" description="Peer practice, great for early rounds." />
                   <ChoiceCard name="pref" selected={preference === "professional"} onSelect={() => setPreference("professional")} title="Professional" description="Alumni and industry professionals." />
                 </div>
               </fieldset>
@@ -251,7 +251,7 @@ export function NewInterviewWizard(props: {
                 {slots === null ? (
                   <div className="flex items-center gap-3 rounded-xl border border-ink-200 p-5 text-sm text-ink-500" role="status"><Spinner /> Finding interviewers that fit your role…</div>
                 ) : slots.length === 0 ? (
-                  <EmptyState title="No open slots match right now" description="Try “Match me now” — we'll send your request to available interviewers — or change your interviewer preference." />
+                  <EmptyState title="No open slots match right now" description="Try “Match me now” to send your request to available interviewers, or change your interviewer preference." />
                 ) : (
                   <div className="grid max-h-80 gap-2 overflow-y-auto pr-1 sm:grid-cols-2" role="radiogroup" aria-label="Available slots">
                     {slots.map((s) => (
@@ -269,7 +269,7 @@ export function NewInterviewWizard(props: {
               <p className="font-medium text-ink-800">Summary</p>
               <p className="mt-1">{LABELS.mode[mode ?? "ai"]} · {LABELS.type[type ?? "behavioral"]} · {targetRole}{company ? ` at ${company}` : ""} · {LABELS.difficulty[difficulty]} · {duration} min</p>
               <p className="mt-2 text-xs text-ink-500">
-                {mode === "human" ? "The AI prepares an interview guide for your interviewer. You won't see the questions in advance — just like the real thing." : "Questions are revealed one at a time. Answer by voice or by typing."}
+                {mode === "human" ? "The AI prepares an interview guide for your interviewer. You won't see the questions in advance, just like the real thing." : "Questions are revealed one at a time. Answer by voice or by typing."}
                 {!props.aiConfigured && " Note: no AI key is configured on this server, so questions come from the curated question bank and grading uses the transparent development rubric."}
               </p>
             </div>

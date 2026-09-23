@@ -90,7 +90,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
                   </span>
                   <h2 className="mt-6 text-xl font-semibold">Finding your interviewer…</h2>
                   <p className="mt-2 max-w-md text-sm text-ink-500">
-                    We&apos;re randomly matching you with a {LABELS.preference[iv.interviewerPreference].toLowerCase() === "anyone" ? "well-suited" : LABELS.preference[iv.interviewerPreference].toLowerCase()} interviewer for {roleCategoryLabel(iv.roleCategory)}. You&apos;ll get a notification the moment someone accepts — feel free to leave this page.
+                    We&apos;re randomly matching you with a {LABELS.preference[iv.interviewerPreference].toLowerCase() === "anyone" ? "well-suited" : LABELS.preference[iv.interviewerPreference].toLowerCase()} interviewer for {roleCategoryLabel(iv.roleCategory)}. You&apos;ll get a notification the moment someone accepts, feel free to leave this page.
                   </p>
                   <p className="mt-4 text-xs text-ink-400">{iv.matchStatus === "pending" ? "Request sent to an interviewer" : "Waiting for an available interviewer"}</p>
                 </CardBody>
@@ -155,7 +155,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
                     <li className="flex gap-3"><Bot className="h-4 w-4 shrink-0 text-olive-700" />{iv.mode === "ai" ? "Your AI interviewer introduces itself and asks one question at a time, with follow-ups based on your answers." : "Your interviewer has an AI-prepared guide. You'll see each question only when it's asked."}</li>
                     <li className="flex gap-3"><Users className="h-4 w-4 shrink-0 text-olive-700" />Treat it like the real thing: quiet space, camera on if you can, answer out loud.</li>
                     <li className="flex gap-3"><Sparkles className="h-4 w-4 shrink-0 text-olive-700" />Your transcript is graded by AI on a standardized 0–100 rubric right after.</li>
-                    <li className="flex gap-3"><AlertTriangle className="h-4 w-4 shrink-0 text-olive-700" />Technical problems are never counted as misconduct — you can always reconnect.</li>
+                    <li className="flex gap-3"><AlertTriangle className="h-4 w-4 shrink-0 text-olive-700" />Technical problems are never counted as misconduct. You can always reconnect.</li>
                   </ul>
                 </CardBody>
               </Card>
@@ -190,7 +190,7 @@ export default async function InterviewPage({ params }: { params: Promise<{ id: 
                   </div>
                   <dl className="grid grid-cols-2 gap-3">
                     <div><dt className="text-xs text-ink-500">Target role</dt><dd className="font-medium">{iv.targetRole}</dd></div>
-                    <div><dt className="text-xs text-ink-500">Company</dt><dd className="font-medium">{iv.company ?? "—"}</dd></div>
+                    <div><dt className="text-xs text-ink-500">Company</dt><dd className="font-medium">{iv.company ?? "N/A"}</dd></div>
                     <div><dt className="text-xs text-ink-500">Type</dt><dd className="font-medium">{LABELS.type[iv.type]}</dd></div>
                     <div><dt className="text-xs text-ink-500">Difficulty</dt><dd className="font-medium">{LABELS.difficulty[iv.difficulty]}</dd></div>
                   </dl>

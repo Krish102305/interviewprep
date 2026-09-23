@@ -1,7 +1,7 @@
 /**
  * Transparent, deterministic answer analysis. Used by the development grading
  * engine and the fallback follow-up generator. It only reads what the candidate
- * actually said — it never invents content.
+ * actually said, it never invents content.
  */
 
 const FILLERS = ["um", "uh", "erm", "like", "you know", "basically", "kind of", "sort of", "i mean", "literally", "actually"];
@@ -75,7 +75,7 @@ export function analyzeAnswer(answer: string, keywords: string[] = []): AnswerAn
   };
 }
 
-/** A short, verbatim excerpt from the answer — the most concrete sentence available. */
+/** A short, verbatim excerpt from the answer, the most concrete sentence available. */
 export function excerpt(answer: string, maxWords = 28, keywords: string[] = []) {
   const sentences = answer
     .split(/(?<=[.!?])\s+/)
@@ -91,7 +91,7 @@ export function excerpt(answer: string, maxWords = 28, keywords: string[] = []) 
   return words.length > maxWords ? `${words.slice(0, maxWords).join(" ")}…` : pick;
 }
 
-/** Normalised containment check — used to reject fabricated AI quotes. */
+/** Normalised containment check, used to reject fabricated AI quotes. */
 export function quoteAppearsIn(quote: string, source: string) {
   const clean = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
   const q = clean(quote.replace(/…$/, ""));

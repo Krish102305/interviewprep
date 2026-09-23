@@ -6,7 +6,7 @@ import type { z } from "zod/v4";
 /**
  * Claude integration. The API key lives only on the server (ANTHROPIC_API_KEY).
  * When it is missing, callers use the rule-based development engine and the UI
- * labels results accordingly — nothing pretends to be AI when it is not.
+ * labels results accordingly, nothing pretends to be AI when it is not.
  */
 
 export const AI_MODEL = process.env.AI_MODEL || "claude-opus-5";
@@ -46,11 +46,19 @@ export async function generateStructured<T extends z.ZodType>(opts: {
     fallbacks: "default",
     thinking: { type: "adaptive" },
     output_config: { effort: opts.effort ?? "medium", format: betaZodOutputFormat(opts.schema) },
-    system: opts.system,
+    system: `${opts.system}\n\nStyle: never use em dashes (—). Use commas, periods or colons instead.`,
     messages: [{ role: "user", content: opts.prompt }],
   });
   if (response.stop_reason === "refusal") throw new Error("The AI declined this request.");
   if (response.stop_reason === "max_tokens") throw new Error("The AI response was truncated.");
   if (response.parsed_output == null) throw new Error("The AI returned an unparseable response.");
-  return response.parsed_output as z.infer<T>;
+  return withoutEmDashes(response.parsed_output) as z.infer<T>;
+}
+
+/** House style: no em dashes anywhere in the app, including AI-written text. */
+export function withoutEmDashes<V>(value: V): V {
+  if (typeof value === "string") return value.replace(/\s*—\s*/g, ", ").replace(/ – /g, ", ") as V;
+  if (Array.isArray(value)) return value.map(withoutEmDashes) as V;
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, withoutEmDashes(v)])) as V;
+  return value;
 }

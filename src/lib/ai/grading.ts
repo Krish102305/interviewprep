@@ -54,7 +54,7 @@ const shortQ = (q: string) => (q.length > 70 ? `${q.slice(0, 67).trim()}…` : q
 const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
 
 // ---------------------------------------------------------------------------
-// Development engine — transparent rubric over the real transcript
+// Development engine, transparent rubric over the real transcript
 // ---------------------------------------------------------------------------
 
 function lengthAdj(words: number) {
@@ -87,7 +87,7 @@ type Analysed = QAPair & { a: AnswerAnalysis & { answer_questionMarks?: number }
 
 function starFeedback(p: Analysed) {
   const missing = (["situation", "task", "action", "result"] as const).filter((k) => !p.a.star[k]);
-  if (!missing.length) return "Your answer covered the full STAR arc — situation, task, action and result.";
+  if (!missing.length) return "Your answer covered the full STAR arc: situation, task, action and result.";
   const have = (["situation", "task", "action", "result"] as const).filter((k) => p.a.star[k]);
   const haveText = have.length ? `You clearly explained the ${have.join(" and ")}` : "The answer didn't establish a clear STAR structure";
   return `${haveText}, but the ${missing.join(" and ")} ${missing.length > 1 ? "were" : "was"} not specific.`;
@@ -146,7 +146,7 @@ export function gradeWithRubric(input: GradingInput): EvaluationResult {
     strengths.push(`You backed claims with concrete numbers in ${quantified.length} answer${quantified.length > 1 ? "s" : ""}, e.g. "${excerpt(quantified[0].answer)}"`);
   const coveredTech = technical.filter((p) => p.a.keywordCoverage >= 0.4);
   if (coveredTech.length)
-    strengths.push(`Solid technical coverage on "${shortQ(coveredTech[0].question)}" — you addressed ${coveredTech[0].a.keywordHits.slice(0, 4).join(", ")}.`);
+    strengths.push(`Solid technical coverage on "${shortQ(coveredTech[0].question)}". You addressed ${coveredTech[0].a.keywordHits.slice(0, 4).join(", ")}.`);
   if (withText.length && avg(withText.map((p) => p.a.fillerRate)) < 0.02) strengths.push("Clean, direct delivery with very few filler words.");
   if (best && !strengths.length) strengths.push(`Your strongest answer was to "${shortQ(best.question)}": "${excerpt(best.answer)}"`);
 
@@ -155,7 +155,7 @@ export function gradeWithRubric(input: GradingInput): EvaluationResult {
     improvements.push(`${starFeedback(noResult[0])} (in "${shortQ(noResult[0].question)}"). Close every story with a specific, ideally measurable, result.`);
   const weAnswers = behavioral.filter((p) => p.a.weStatements > p.a.iStatements + 1);
   if (weAnswers.length)
-    improvements.push(`In ${weAnswers.length} answer${weAnswers.length > 1 ? "s" : ""} you mostly said "we". Interviewers need to hear what *you* did — use "I" for your own actions.`);
+    improvements.push(`In ${weAnswers.length} answer${weAnswers.length > 1 ? "s" : ""} you mostly said "we". Interviewers need to hear what *you* did. Use "I" for your own actions.`);
   const brief = withText.filter((p) => p.a.words < 40);
   if (brief.length) improvements.push(`${brief.length} answer${brief.length > 1 ? "s were" : " was"} under 40 words (e.g. "${shortQ(brief[0].question)}"). Aim for 1–2 minutes with context, actions and results.`);
   const missedTech = technical.filter((p) => p.a.keywordCoverage < 0.3 && p.keywords.length);
@@ -169,7 +169,7 @@ export function gradeWithRubric(input: GradingInput): EvaluationResult {
   if (hedgy.length) improvements.push(`Hedging phrases ("I guess", "probably", "not sure") weakened ${hedgy.length} answer${hedgy.length > 1 ? "s" : ""}. State your reasoning with conviction.`);
   const unanswered = answered.filter((p) => !p.answer.trim());
   if (unanswered.length) improvements.push(`${unanswered.length} question${unanswered.length > 1 ? "s were" : " was"} left unanswered.`);
-  if (!improvements.length && weakest) improvements.push(`Your least developed answer was to "${shortQ(weakest.question)}" — rehearse it with a clearer structure.`);
+  if (!improvements.length && weakest) improvements.push(`Your least developed answer was to "${shortQ(weakest.question)}". Rehearse it with a clearer structure.`);
 
   const questionFeedback: QuestionFeedback[] = answered.map((p) => ({
     questionId: p.questionId,
@@ -198,7 +198,7 @@ export function gradeWithRubric(input: GradingInput): EvaluationResult {
       ? "Overall this was a strong, interview-ready performance."
       : overallScore >= 65
         ? "The foundation is solid; tightening structure and specificity will lift your score."
-        : "There's clear room to grow — focus on complete, specific answers with measurable results.");
+        : "There's clear room to grow. Focus on complete, specific answers with measurable results.");
 
   return {
     engine: "fallback",
@@ -258,7 +258,7 @@ const EvaluationSchema = z.object({
   interviewer_feedback_summary: z.string().nullable(),
 });
 
-const GRADING_SYSTEM = `You are the standardized grading engine for Interview Connect. Every practice interview — whether conducted by an AI or by a human interviewer — is graded by you so scores are consistent across the platform.
+const GRADING_SYSTEM = `You are the standardized grading engine for Interview Connect. Every practice interview, whether conducted by an AI or by a human interviewer, is graded by you so scores are consistent across the platform.
 
 Grade strictly from the transcript. Scoring scale (0–100) for every category:
 90–100 exceptional, would stand out at a top firm · 75–89 strong, interview-ready · 60–74 developing, noticeable gaps · 40–59 weak · below 40 missing or off-target.
@@ -271,7 +271,7 @@ Rubric by interview type:
 Rules:
 - Only score categories listed as applicable; return null for the others.
 - Explain scores using the candidate's actual responses. Any quote you give (answer_quote, or quotes inside strengths/improvements) must be copied verbatim from the transcript. Never fabricate examples.
-- Unanswered questions lower the score; do not penalize nervousness, pauses, accents, disabilities, or technical glitches — judge the content and communication.
+- Unanswered questions lower the score; do not penalize nervousness, pauses, accents, disabilities, or technical glitches. Judge the content and communication.
 - Human interviewer feedback (if any) is qualitative context. Summarize it for the candidate in interviewer_feedback_summary, but it never overrides your standardized evaluation.
 - Strengths and improvements: 2–4 each, specific and actionable. The summary is 2–3 sentences addressed to the candidate ("you").`;
 

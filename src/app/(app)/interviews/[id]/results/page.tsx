@@ -123,7 +123,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-100 bg-ink-50/60 px-6 py-3 text-xs text-ink-500 sm:px-8">
           <span className="flex items-center gap-1.5">
             <Info className="h-3.5 w-3.5" />
-            {ev.engine === "ai" ? "Standardized AI evaluation of your transcript. The official score is always AI-graded — never set by a person." : "Development grading: no AI key is configured on this server, so this score comes from Interview Connect's transparent rule-based rubric over your transcript."}
+            {ev.engine === "ai" ? "Standardized AI evaluation of your transcript. The official score is always AI-graded and never set by a person." : "Development grading: no AI key is configured on this server, so this score comes from Interview Connect's transparent rule-based rubric over your transcript."}
           </span>
           {(pointsEarned._sum.amount ?? 0) > 0 && <span className="flex items-center gap-1.5 font-medium text-olive-700"><Trophy className="h-3.5 w-3.5" /> +{pointsEarned._sum.amount} points earned</span>}
         </div>
@@ -139,7 +139,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
         <Card>
           <CardHeader title={<span className="flex items-center gap-2"><Target className="h-4 w-4 text-amber-600" /> Areas to improve</span>} />
           <CardBody>
-            {improvements.length ? <ul className="space-y-3 text-sm leading-relaxed text-ink-700">{improvements.map((s) => <li key={s} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />{s}</li>)}</ul> : <p className="text-sm text-ink-500">Nothing major — keep practicing at a higher difficulty.</p>}
+            {improvements.length ? <ul className="space-y-3 text-sm leading-relaxed text-ink-700">{improvements.map((s) => <li key={s} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />{s}</li>)}</ul> : <p className="text-sm text-ink-500">Nothing major, keep practicing at a higher difficulty.</p>}
           </CardBody>
         </Card>
       </div>
@@ -200,7 +200,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
       {iv.mode === "human" && iv.interviewerId && ctx.role === "candidate" && (
         <Card className="mt-6">
           <CardHeader title="Rate your interviewer" />
-          <CardBody>{iv.rating ? <p className="text-sm text-ink-500">Thanks — you rated this interview.</p> : <RatingForm interviewId={iv.id} interviewerName={interviewerName} />}</CardBody>
+          <CardBody>{iv.rating ? <p className="text-sm text-ink-500">Thanks for rating this interview.</p> : <RatingForm interviewId={iv.id} interviewerName={interviewerName} />}</CardBody>
         </Card>
       )}
 

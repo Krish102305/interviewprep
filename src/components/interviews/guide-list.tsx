@@ -25,7 +25,7 @@ export function GuideList({ questions }: { questions: Q[] }) {
             </div>
             <div>
               <dt className="text-xs font-medium text-ink-500">Suggested follow-up</dt>
-              <dd className="mt-0.5 text-ink-700">{parseJsonArray(q.followUps)[0] ? `“${parseJsonArray(q.followUps)[0]}”` : "—"}</dd>
+              <dd className="mt-0.5 text-ink-700">{parseJsonArray(q.followUps)[0] ? `“${parseJsonArray(q.followUps)[0]}”` : "N/A"}</dd>
             </div>
           </dl>
           {parseJsonArray(q.gradingCriteria).length > 0 && (

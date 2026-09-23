@@ -163,7 +163,7 @@ export function HumanRoom({ id }: { id: string }) {
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="flex items-center gap-2">
                   <Subtitles className="h-4 w-4" />
-                  {!speech.supported ? "Speech-to-text isn't supported in this browser — type key points of your answers below so they can be graded." : speech.listening ? <>Live transcription on <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /></> : media.micOn ? "Live transcription paused" : "Unmute to transcribe your answers"}
+                  {!speech.supported ? "Speech-to-text isn't supported in this browser. Type key points of your answers below so they can be graded." : speech.listening ? <>Live transcription on <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" /></> : media.micOn ? "Live transcription paused" : "Unmute to transcribe your answers"}
                 </p>
                 {speech.supported && <button onClick={() => setCaptions((c) => !c)} className="text-xs underline-offset-2 hover:underline">{captions ? "Turn off transcription" : "Turn on transcription"}</button>}
               </div>
@@ -206,7 +206,7 @@ export function HumanRoom({ id }: { id: string }) {
         loading={ending}
         tone={isInterviewer ? "primary" : "danger"}
         title={isInterviewer ? "End the interview?" : "Leave the interview?"}
-        description={isInterviewer ? "The transcript will be graded by AI. You'll be able to add optional feedback next." : "Leaving early without a reason may be reported by your interviewer. If you're having technical trouble, you can rejoin instead — technical issues are never misconduct."}
+        description={isInterviewer ? "The transcript will be graded by AI. You'll be able to add optional feedback next." : "Leaving early without a reason may be reported by your interviewer. If you're having technical trouble, you can rejoin instead. Technical issues are never misconduct."}
         confirmLabel={isInterviewer ? "End interview" : "Leave interview"}
       />
     </Dark>
@@ -402,7 +402,7 @@ function NotesPanel({ id, activeQuestionId }: { id: string; activeQuestionId: st
   }
   return (
     <div className="space-y-4 p-4">
-      <p className="flex items-center gap-2 text-xs text-ink-500"><NotebookPen className="h-3.5 w-3.5" /> Only you (and admins) can see these. They inform — but never set — the AI score.</p>
+      <p className="flex items-center gap-2 text-xs text-ink-500"><NotebookPen className="h-3.5 w-3.5" /> Only you (and admins) can see these. They inform, but never set, the AI score.</p>
       <Textarea value={text} onChange={(e) => setText(e.target.value)} placeholder="e.g. Strong structure, but no metrics on the result." aria-label="New private note" className="min-h-[72px]" />
       <Button size="sm" onClick={add} loading={busy} disabled={!text.trim()}><MessageSquarePlus className="h-4 w-4" /> Add note</Button>
       {notes === null ? <Spinner className="text-ink-400" /> : notes.length === 0 ? <p className="text-sm text-ink-400">No notes yet.</p> : (

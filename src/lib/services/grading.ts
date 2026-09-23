@@ -12,7 +12,7 @@ import { recommendNext } from "./performance";
  *   interview → transcript → question/answer pairs → type/role/JD/rubric
  *   → AI evaluation → category + overall scores → strengths/weaknesses → recommendations
  *
- * Every interview — AI or human — goes through here. Human interviewers can add
+ * Every interview, AI or human, goes through here. Human interviewers can add
  * qualitative feedback, but only this pipeline writes the official score.
  */
 export async function runGrading(interviewId: string) {
@@ -67,7 +67,7 @@ export async function runGrading(interviewId: string) {
       data: {
         gradingStatus: "failed",
         gradingError:
-          "No answers were captured in the transcript, so this interview couldn't be scored. This isn't counted against you — if speech capture didn't work, try typing your answers next time.",
+          "No answers were captured in the transcript, so this interview couldn't be scored. This isn't counted against you. If speech capture didn't work, try typing your answers next time.",
       },
     });
     await track("grading_failed", iv.studentId, { reason: "no_answers" });
@@ -119,7 +119,7 @@ export async function runGrading(interviewId: string) {
     console.error("[grading] failed", err);
     await db.interview.update({
       where: { id: interviewId },
-      data: { gradingStatus: "failed", gradingError: "The AI grading service didn't respond. Your transcript is saved — retry grading in a moment." },
+      data: { gradingStatus: "failed", gradingError: "The AI grading service didn't respond. Your transcript is saved. Retry grading in a moment." },
     });
     await track("grading_failed", iv.studentId, { reason: "ai_error" });
   }

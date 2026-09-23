@@ -77,7 +77,7 @@ export default async function StudentDashboard() {
             </div>
           )}
         </Card>
-        <StatCard label="Interview Score" value={perf.summary.latest ?? "—"} sub={perf.summary.average != null ? `Average ${perf.summary.average} · Best ${perf.summary.highest}` : "Complete an interview to get scored"} icon={<Gauge className="h-4 w-4" />} tone="olive" />
+        <StatCard label="Interview Score" value={perf.summary.latest ?? "N/A"} sub={perf.summary.average != null ? `Average ${perf.summary.average} · Best ${perf.summary.highest}` : "Complete an interview to get scored"} icon={<Gauge className="h-4 w-4" />} tone="olive" />
         <StatCard label="Total Interviews" value={completed} sub={`${perf.summary.aiCount} AI · ${perf.summary.humanCount} human graded`} icon={<Layers className="h-4 w-4" />} />
         <StatCard
           label="Points"
@@ -142,7 +142,7 @@ export default async function StudentDashboard() {
           {recent.length ? (
             <InterviewList rows={recent} timeZone={tz} />
           ) : (
-            <div className="p-6"><EmptyState title="No completed interviews yet" description="Your history — with scores and feedback — will show up here." /></div>
+            <div className="p-6"><EmptyState title="No completed interviews yet" description="Your history, with scores and feedback, will show up here." /></div>
           )}
         </div>
       </Card>

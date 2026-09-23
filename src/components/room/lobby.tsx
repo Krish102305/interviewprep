@@ -94,21 +94,21 @@ export function Lobby({ id }: { id: string }) {
             <Button variant="secondary" size="sm" onClick={media.toggleMic} disabled={!media.hasAudio}>{media.micOn ? "Mute" : "Unmute"}</Button>
             {media.error && <Button variant="ghost" size="sm" onClick={() => media.start()}><RefreshCw className="h-4 w-4" /> Retry devices</Button>}
           </div>
-          {media.error && <Alert tone="warning" className="mt-4" title="Device access">{media.error} You can still join — technical issues are never counted against you.</Alert>}
+          {media.error && <Alert tone="warning" className="mt-4" title="Device access">{media.error} You can still join. Technical issues are never counted against you.</Alert>}
           <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-            <Check icon={Camera} ok={media.hasVideo} pending={!media.stream && !media.error} label="Camera preview" detail={media.hasVideo ? "Camera is working" : "No camera — you can join audio-only"} />
+            <Check icon={Camera} ok={media.hasVideo} pending={!media.stream && !media.error} label="Camera preview" detail={media.hasVideo ? "Camera is working" : "No camera. You can join audio-only"} />
             <li className="flex items-start gap-3 rounded-xl border border-ink-200 bg-white p-3.5">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink-50 text-ink-600"><Mic className="h-4 w-4" /></span>
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-ink-900">Microphone test</p>
-                <p className="text-xs text-ink-500">{media.hasAudio ? "Say something — the bar should move" : "No microphone detected"}</p>
+                <p className="text-xs text-ink-500">{media.hasAudio ? "Say something and the bar should move" : "No microphone detected"}</p>
                 <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-ink-100" role="meter" aria-label="Microphone level" aria-valuenow={Math.round(media.level * 100)} aria-valuemin={0} aria-valuemax={100}>
                   <div className="h-full rounded-full bg-olive-600 transition-all duration-75" style={{ width: `${Math.round(media.level * 100)}%` }} />
                 </div>
               </div>
             </li>
             <Check icon={Wifi} ok={net.status === "good" || net.status === "fair"} pending={net.status === "checking"} label="Internet connection" detail={net.status === "checking" ? "Measuring…" : `${net.status[0].toUpperCase()}${net.status.slice(1)}${net.ms ? ` · ${net.ms} ms` : ""}`} />
-            <Check icon={Subtitles} ok={speechOk} pending={speechOk === null} label="Live transcription" detail={speechOk ? "Supported in this browser" : "Not supported — typed answers available"} />
+            <Check icon={Subtitles} ok={speechOk} pending={speechOk === null} label="Live transcription" detail={speechOk ? "Supported in this browser" : "Not supported. Typed answers available"} />
           </ul>
         </section>
 
@@ -120,7 +120,7 @@ export function Lobby({ id }: { id: string }) {
               <div><dt className="text-xs text-ink-500">Interview type</dt><dd className="font-medium">{LABELS.type[state.type]}</dd></div>
               <div><dt className="text-xs text-ink-500">Duration</dt><dd className="flex items-center gap-1 font-medium"><Clock className="h-3.5 w-3.5" />{state.duration} minutes</dd></div>
               <div><dt className="text-xs text-ink-500">Target role</dt><dd className="font-medium">{state.targetRole}</dd></div>
-              <div><dt className="text-xs text-ink-500">{isCandidate ? "Interviewer" : "Candidate"}</dt><dd className="font-medium">{other?.name ?? "—"}</dd></div>
+              <div><dt className="text-xs text-ink-500">{isCandidate ? "Interviewer" : "Candidate"}</dt><dd className="font-medium">{other?.name ?? "N/A"}</dd></div>
             </dl>
             <div className={cn("mt-5 flex items-center gap-2 rounded-lg px-3 py-2 text-xs", otherReady ? "bg-emerald-50 text-emerald-800" : "bg-ink-50 text-ink-600")} role="status">
               {otherReady ? <CheckCircle2 className="h-4 w-4" /> : <Loader2 className="h-4 w-4 animate-spin" />}

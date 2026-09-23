@@ -8,8 +8,8 @@ import { BACKCHANNELS, isTtsConfigured, synthesize, TtsError, type Backchannel }
 
 /**
  * The AI interviewer's voice. Only speaks text the interviewer actually said in
- * this interview (by transcript entry id) or a fixed short reaction — never
- * arbitrary text — and only to the candidate in the room.
+ * this interview (by transcript entry id) or a fixed short reaction, never
+ * arbitrary text, and only to the candidate in the room.
  *   GET ?entries=id1,id2   → MP3 stream
  *   GET ?phrase=mhm        → MP3 stream
  */

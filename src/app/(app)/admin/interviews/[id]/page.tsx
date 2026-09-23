@@ -52,15 +52,15 @@ export default async function AdminInterviewDetail({ params }: { params: Promise
           <CardBody className="space-y-4 text-sm">
             <div>
               <p className="text-xs font-semibold text-ink-500">Conduct signals</p>
-              {iv.conductEvents.length ? <ul className="mt-1 space-y-1">{iv.conductEvents.map((e) => <li key={e.id}>{formatDateTime(e.createdAt)} — <strong>{fullName(e.user.profile)}</strong>: {e.type.replaceAll("_", " ")} ({e.source}){e.details ? ` — ${e.details}` : ""}</li>)}</ul> : <p className="text-ink-400">None</p>}
+              {iv.conductEvents.length ? <ul className="mt-1 space-y-1">{iv.conductEvents.map((e) => <li key={e.id}>{formatDateTime(e.createdAt)} · <strong>{fullName(e.user.profile)}</strong>: {e.type.replaceAll("_", " ")} ({e.source}){e.details ? `, ${e.details}` : ""}</li>)}</ul> : <p className="text-ink-400">None</p>}
             </div>
             <div>
               <p className="text-xs font-semibold text-ink-500">Technical events</p>
-              {iv.technicalEvents.length ? <ul className="mt-1 space-y-1">{iv.technicalEvents.map((e) => <li key={e.id}>{formatDateTime(e.createdAt)} — <strong>{fullName(e.user.profile)}</strong>: {e.type.replaceAll("_", " ")}{e.details ? ` — ${e.details}` : ""}</li>)}</ul> : <p className="text-ink-400">None</p>}
+              {iv.technicalEvents.length ? <ul className="mt-1 space-y-1">{iv.technicalEvents.map((e) => <li key={e.id}>{formatDateTime(e.createdAt)} · <strong>{fullName(e.user.profile)}</strong>: {e.type.replaceAll("_", " ")}{e.details ? `, ${e.details}` : ""}</li>)}</ul> : <p className="text-ink-400">None</p>}
             </div>
             <div>
               <p className="text-xs font-semibold text-ink-500">Reports</p>
-              {iv.conductReports.length ? <ul className="mt-1 space-y-1">{iv.conductReports.map((r) => <li key={r.id}>{conductReasonLabel(r.reason)} — <Badge tone={toneForStatus(r.status)}>{r.status}</Badge> <Link href="/admin/reports?status=all" className="text-xs underline">review</Link></li>)}</ul> : <p className="text-ink-400">None</p>}
+              {iv.conductReports.length ? <ul className="mt-1 space-y-1">{iv.conductReports.map((r) => <li key={r.id}>{conductReasonLabel(r.reason)} <Badge tone={toneForStatus(r.status)}>{r.status}</Badge> <Link href="/admin/reports?status=all" className="text-xs underline">review</Link></li>)}</ul> : <p className="text-ink-400">None</p>}
             </div>
           </CardBody>
         </Card>

@@ -6,7 +6,7 @@ import { forbidden } from "@/lib/errors";
 import { loadForUser } from "@/lib/services/interviews";
 import { fileReport } from "@/lib/services/conduct";
 
-/** Report the other participant. Creates a PENDING report — never a strike. */
+/** Report the other participant. Creates a PENDING report, never a strike. */
 export const POST = route<{ id: string }>(
   async (req, { params }) => {
     const user = await requireApiUser();

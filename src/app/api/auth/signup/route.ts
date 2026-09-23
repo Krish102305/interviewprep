@@ -15,7 +15,7 @@ export const POST = route(
       data: {
         email: input.email,
         passwordHash: await hashPassword(input.password),
-        role: input.role, // validated to student | interviewer — never admin
+        role: input.role, // validated to student | interviewer, never admin
         profile: { create: { firstName: input.firstName, lastName: input.lastName } },
       },
     });

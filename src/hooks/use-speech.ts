@@ -25,7 +25,7 @@ function getCtor(): (new () => SpeechRecognitionLike) | null {
 /**
  * Live transcription using the browser's built-in speech recognition (Chrome,
  * Edge, Safari). Where it's unsupported, `supported` is false and the UI offers
- * typed answers instead — we never fabricate a transcript.
+ * typed answers instead, we never fabricate a transcript.
  */
 export function useSpeechRecognition(onFinal: (text: string) => void, ignore?: { current: boolean }) {
   const [supported, setSupported] = useState(false);
@@ -73,13 +73,13 @@ export function useSpeechRecognition(onFinal: (text: string) => void, ignore?: {
         want.current = false;
         setError("No microphone is available for speech-to-text. You can type your answers instead.");
       } else if (e.error === "network") {
-        setError("The browser's speech service is unreachable right now — keep talking or type your answer; we'll retry automatically.");
+        setError("The browser's speech service is unreachable right now. Keep talking or type your answer; we'll retry automatically.");
       } else if (e.error !== "no-speech" && e.error !== "aborted") setError("Speech-to-text hit a problem. You can type your answers instead.");
     };
     r.onend = () => {
       rec.current = null;
       setInterim("");
-      // Browsers stop recognition after silence — restart while the user still wants it.
+      // Browsers stop recognition after silence, restart while the user still wants it.
       if (want.current) setTimeout(() => want.current && start(), 250);
       else setListening(false);
     };
@@ -130,7 +130,7 @@ export type SpeakOptions = {
   gender?: "female" | "male";
   onStart?: () => void;
   onEnd?: () => void;
-  /** Fires on each spoken word (where the browser supports it) — used for lip-sync. */
+  /** Fires on each spoken word (where the browser supports it), used for lip-sync. */
   onWord?: () => void;
   /** Natural voice audio (server-generated MP3). Falls back to the browser voice if it fails. */
   audioUrl?: string;
@@ -155,7 +155,7 @@ export function unlockAudio() {
 
 /**
  * The AI interviewer's voice. Plays the natural (ElevenLabs) voice when an
- * audioUrl is given, otherwise — or if that fails — the browser's built-in
+ * audioUrl is given, otherwise, or if that fails, the browser's built-in
  * speech synthesis. When muted or unsupported, onStart/onEnd still fire over an
  * estimated duration so the on-screen interviewer keeps "talking" with captions.
  * Returns a cancel function.
@@ -273,7 +273,7 @@ function speakBrowser(text: string, enabled: boolean, opts: SpeakOptions): () =>
   u.onboundary = (e) => {
     if (e.name === "word" || e.name === undefined) opts.onWord?.();
   };
-  // Some browsers never fire onend (e.g. tab backgrounded) — don't leave the mouth moving.
+  // Some browsers never fire onend (e.g. tab backgrounded), don't leave the mouth moving.
   const safety = setTimeout(finish, estimateMs * 2 + 4000);
   opts.onStart?.();
   window.speechSynthesis.speak(u);

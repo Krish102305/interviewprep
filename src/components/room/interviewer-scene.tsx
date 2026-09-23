@@ -18,13 +18,13 @@ export function InterviewerScene({
   className,
 }: {
   persona: Persona;
-  /** Interviewer is talking — drives the lip-sync. */
+  /** Interviewer is talking, drives the lip-sync. */
   speaking: boolean;
   /** Increments on every spoken word boundary (TTS) for tighter lip-sync. */
   pulse?: number;
-  /** Candidate is talking — interviewer nods occasionally. */
+  /** Candidate is talking, interviewer nods occasionally. */
   listening?: boolean;
-  /** Interviewer is "considering" an answer — gaze drifts away. */
+  /** Interviewer is "considering" an answer, gaze drifts away. */
   thinking?: boolean;
   /** Live voice amplitude (0–1) when real audio is playing; null → synthetic rhythm. */
   mouthLevel?: React.RefObject<number | null>;
@@ -145,7 +145,7 @@ export function InterviewerScene({
         <Scene scene={persona.scene} id={id} />
       </g>
 
-      {/* Person — framed head-and-shoulders like a webcam shot */}
+      {/* Person, framed head-and-shoulders like a webcam shot */}
       <g transform="translate(640 720) scale(1.32) translate(-640 -720)">
       <g className="ic-breathe">
         {/* Long / bob hair behind the head */}
@@ -233,7 +233,7 @@ export function InterviewerScene({
             <ellipse cx={634} cy={378} rx={4} ry={2.4} fill={L.skinShadow} opacity={0.6} />
             <ellipse cx={649} cy={378} rx={4} ry={2.4} fill={L.skinShadow} opacity={0.6} />
 
-            {/* Mouth — lip-synced */}
+            {/* Mouth, lip-synced */}
             <g>
               {o > 0.04 && <ellipse cx={640} cy={409 + o * 4} rx={19 + o * 3} ry={1.5 + o * 9.5} fill="#3B1614" />}
               {o > 0.35 && <rect x={627} y={405} width={26} height={3 + o * 2} rx={1.5} fill="#F6F1EA" opacity={0.95} />}

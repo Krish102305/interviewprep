@@ -6,16 +6,16 @@ import { MarketingFooter, MarketingNav } from "@/components/marketing/nav";
 
 const problems = [
   { title: "Interview anxiety", body: "Most students walk into their first real interview having never felt real interview pressure. Nerves take over and preparation goes out the window." },
-  { title: "No realistic practice", body: "Reading question lists isn't practice. Answering out loud, to someone unfamiliar, on a clock — that's what the real thing feels like." },
+  { title: "No realistic practice", body: "Reading question lists isn't practice. Answering out loud, to someone unfamiliar, on a clock: that's what the real thing feels like." },
   { title: "Weak, vague feedback", body: "“That was good!” doesn't help you improve. You need specific, standardized feedback on what to fix and what to practice next." },
   { title: "Practicing with friends", body: "Friends are too kind, too familiar and rarely know what a strong answer sounds like for your target role." },
 ];
 
 const steps = [
-  { n: "01", title: "Build your profile", body: "School, target roles, resume and goals — so every interview is customized to you." },
+  { n: "01", title: "Build your profile", body: "School, target roles, resume and goals, so that every interview is customized to you." },
   { n: "02", title: "Choose your interview", body: "AI or human. Behavioral, technical or a full interview. Add a company and job description." },
   { n: "03", title: "Get matched or start AI", body: "Start instantly with our AI interviewer, or get randomly matched with a student or professional." },
-  { n: "04", title: "Complete the interview", body: "One question at a time, adaptive follow-ups, real pressure — in a professional video room." },
+  { n: "04", title: "Complete the interview", body: "One question at a time, with adaptive follow-ups and real pressure, in a professional video room." },
   { n: "05", title: "Get AI feedback", body: "Every interview is graded by AI on a standardized 0–100 rubric, with evidence from your own answers." },
   { n: "06", title: "Improve", body: "Track your scores over time, earn points and badges, and practice exactly what the AI recommends next." },
 ];
@@ -24,8 +24,8 @@ const features = [
   { icon: Video, title: "Realistic practice", body: "A serious interview room with video, a timer and questions revealed one at a time. No chatbot vibes." },
   { icon: Users, title: "Real interviewers", body: "Practice with other students, alumni and professionals who conduct interviews with an AI-prepared guide." },
   { icon: Sparkles, title: "AI customization", body: "Questions generated from your resume, the job description, the company and your experience level." },
-  { icon: Shuffle, title: "Random matching", body: "Meet different interviewers, styles and backgrounds — just like the unpredictability of real recruiting." },
-  { icon: Trophy, title: "Gamification", body: "Points, levels, streaks, badges and a leaderboard keep you coming back — outside the interview room." },
+  { icon: Shuffle, title: "Random matching", body: "Meet different interviewers, styles and backgrounds, much like the unpredictability of real recruiting." },
+  { icon: Trophy, title: "Gamification", body: "Points, levels, streaks, badges and a leaderboard keep you coming back (outside the interview room)." },
   { icon: Gauge, title: "AI-powered evaluation", body: "One standardized grading layer for every interview, AI or human, so your scores are comparable over time." },
 ];
 
@@ -124,7 +124,7 @@ export default function LandingPage() {
             <div className="max-w-2xl">
               <p className="eyebrow">The problem</p>
               <h2 id="problem-title" className="mt-3 text-3xl font-semibold text-ink-950 sm:text-4xl">Talent isn&apos;t the gap. Practice is.</h2>
-              <p className="mt-4 text-ink-600">Students prepare for interviews in ways that never recreate the real thing — so the first real pressure they feel is on the day that counts.</p>
+              <p className="mt-4 text-ink-600">Students prepare for interviews in ways that never recreate the real thing, so the first real pressure they feel is on the day that counts.</p>
             </div>
             <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-ink-200 bg-ink-200 sm:grid-cols-2 lg:grid-cols-4">
               {problems.map((p, i) => (
@@ -159,7 +159,7 @@ export default function LandingPage() {
               <div className="rounded-3xl border border-ink-900 bg-ink-950 p-8 text-white shadow-lift">
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-olive-500 text-white"><Users className="h-6 w-6" /></span>
                 <h3 className="mt-6 text-xl font-semibold">Human Interview</h3>
-                <p className="mt-2 text-ink-300">Practice with a real person — another student, an alum or a professional — who runs your interview from an AI-generated guide you never see.</p>
+                <p className="mt-2 text-ink-300">Practice with a real person (another student, an alum or a professional) who runs your interview from an AI-generated guide you never see.</p>
                 <ul className="mt-6 space-y-2 text-sm text-ink-200">
                   {["Random matching for real unpredictability", "Live video, real pressure", "Optional interviewer feedback in your report"].map((t) => (
                     <li key={t} className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-olive-300" />{t}</li>
@@ -218,12 +218,12 @@ export default function LandingPage() {
             <div>
               <p className="eyebrow">Every interview is graded by AI</p>
               <h2 id="grading-title" className="mt-3 text-3xl font-semibold text-ink-950 sm:text-4xl">One standard. Every interview.</h2>
-              <p className="mt-4 text-ink-600">Whether an AI or a person interviews you, the same AI grading layer evaluates your transcript against a role-specific rubric. Human interviewers add notes — they never set your score.</p>
+              <p className="mt-4 text-ink-600">Whether an AI or a person interviews you, the same AI grading layer evaluates your transcript against a role-specific rubric. Human interviewers add notes, but they never set your score.</p>
               <ul className="mt-8 space-y-4">
                 {[
                   { icon: Target, t: "STAR analysis", d: "Pinpoints missing or weak Situation, Task, Action and Result." },
                   { icon: Brain, t: "Role-aware technical grading", d: "Finance, product, engineering, consulting and marketing rubrics." },
-                  { icon: Sparkles, t: "Evidence, not guesses", d: "Feedback quotes your actual answers — nothing is fabricated." },
+                  { icon: Sparkles, t: "Evidence, not guesses", d: "Feedback quotes your actual answers. Nothing is fabricated." },
                 ].map((x) => (
                   <li key={x.t} className="flex gap-4">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ink-900 text-white"><x.icon className="h-4 w-4" /></span>
@@ -263,7 +263,7 @@ export default function LandingPage() {
             <div className="rounded-3xl bg-olive-700 p-8 text-white sm:p-10">
               <Users className="h-8 w-8 text-olive-200" />
               <h2 className="mt-6 text-2xl font-semibold sm:text-3xl">Become an interviewer</h2>
-              <p className="mt-3 max-w-md text-olive-100">Students, alumni and professionals: help the next generation prepare. We generate the interview guide — you bring the real-world perspective.</p>
+              <p className="mt-3 max-w-md text-olive-100">Students, alumni and professionals: help the next generation prepare. We generate the interview guide. You bring the real-world perspective.</p>
               <ul className="mt-6 space-y-2 text-sm text-olive-50">
                 {["AI-generated question guide with suggested follow-ups", "Set your own availability", "Earn points, ratings and the Top Interviewer badge"].map((t) => (
                   <li key={t} className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-olive-200" />{t}</li>
@@ -274,9 +274,9 @@ export default function LandingPage() {
             <div id="conduct" className="scroll-mt-20 rounded-3xl border border-ink-200 bg-white p-8 sm:p-10">
               <ShieldCheck className="h-8 w-8 text-olive-700" />
               <h2 className="mt-6 text-2xl font-semibold sm:text-3xl">Professional by design</h2>
-              <p className="mt-3 text-ink-600">A fair three-strike conduct system keeps every interview serious and respectful — for students and interviewers alike.</p>
+              <p className="mt-3 text-ink-600">A fair three-strike conduct system keeps every interview serious and respectful, for students and interviewers alike.</p>
               <ul className="mt-6 space-y-3 text-sm text-ink-700">
-                <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-olive-600" />Warnings first — a chance to correct course before any strike.</li>
+                <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-olive-600" />Warnings first: a chance to correct course before any strike.</li>
                 <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-olive-600" />Strikes only after human review of evidence. Appeals always available.</li>
                 <li className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-olive-600" />Nerves, pauses, eye contact, accessibility needs or bad Wi-Fi are never misconduct.</li>
               </ul>

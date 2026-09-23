@@ -47,7 +47,7 @@ export function RatingForm({ interviewId, interviewerName }: { interviewId: stri
   }
   return (
     <div className="space-y-4">
-      <p className="text-sm text-ink-600">How was your interview with {interviewerName}? Ratings help us match better — they never affect your score.</p>
+      <p className="text-sm text-ink-600">How was your interview with {interviewerName}? Ratings help us match better. They never affect your score.</p>
       <div className="grid gap-3 sm:grid-cols-2">
         {FIELDS.map((f) => (
           <div key={f.key} className="flex items-center justify-between gap-3 rounded-lg bg-ink-50 px-3 py-2">

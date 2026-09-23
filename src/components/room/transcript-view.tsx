@@ -14,7 +14,7 @@ export function TranscriptView({ entries, interviewerName, candidateName, classN
       {entries.length === 0 && <p className="text-ink-400">The transcript will appear here as the interview progresses.</p>}
       {entries.map((e) =>
         e.speaker === "system" ? (
-          <p key={e.id} className="text-center text-xs text-ink-400">— {e.text} —</p>
+          <p key={e.id} className="text-center text-xs text-ink-400">{e.text}</p>
         ) : (
           <div key={e.id}>
             <p className={cn("text-[11px] font-semibold uppercase tracking-wide", e.speaker === "interviewer" ? "text-olive-600" : "text-ink-500")}>

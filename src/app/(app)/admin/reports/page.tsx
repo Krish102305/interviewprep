@@ -57,11 +57,11 @@ export default async function AdminReports({ searchParams }: { searchParams: Pro
                     </p>
                     <p className="mt-3 rounded-lg bg-ink-50 p-3 text-sm text-ink-700">{r.description}</p>
                     <div className="mt-3"><EvidenceBlock evidence={r.evidence} /></div>
-                    {r.reviewedBy && <p className="mt-3 text-xs text-ink-500">Reviewed by {fullName(r.reviewedBy.profile)} {r.reviewNote ? `— “${r.reviewNote}”` : ""}</p>}
+                    {r.reviewedBy && <p className="mt-3 text-xs text-ink-500">Reviewed by {fullName(r.reviewedBy.profile)} {r.reviewNote ? `: “${r.reviewNote}”` : ""}</p>}
                   </div>
                   {r.status === "pending" && (
                     <div className="flex shrink-0 gap-2">
-                      <AdminAction url={`/api/admin/reports/${r.id}`} body={{ decision: "confirm" }} label="Confirm strike" variant="danger" title="Confirm this report?" description={`This issues strike ${Math.min(3, r.user._count.strikes + 1)} of 3 to ${fullName(r.user.profile)}.${r.user._count.strikes >= 2 ? " This is their third strike — the account will be banned and upcoming interviews cancelled." : ""}`} success="Report confirmed and strike issued." />
+                      <AdminAction url={`/api/admin/reports/${r.id}`} body={{ decision: "confirm" }} label="Confirm strike" variant="danger" title="Confirm this report?" description={`This issues strike ${Math.min(3, r.user._count.strikes + 1)} of 3 to ${fullName(r.user.profile)}.${r.user._count.strikes >= 2 ? " This is their third strike, the account will be banned and upcoming interviews cancelled." : ""}`} success="Report confirmed and strike issued." />
                       <AdminAction url={`/api/admin/reports/${r.id}`} body={{ decision: "dismiss" }} label="Dismiss" tone="primary" title="Dismiss this report?" description="No strike will be issued. The reporter will be notified that it was reviewed." success="Report dismissed." />
                     </div>
                   )}

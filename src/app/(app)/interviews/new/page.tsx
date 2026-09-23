@@ -17,7 +17,7 @@ export default async function NewInterviewPage({ searchParams }: { searchParams:
   ]);
   return (
     <div className="mx-auto max-w-4xl">
-      <PageHeader eyebrow="Start an interview" title="Set up your practice interview" description="Every interview is customized by AI and graded by AI — whoever conducts it." />
+      <PageHeader eyebrow="Start an interview" title="Set up your practice interview" description="Every interview is customized by AI and graded by AI, no matter who conducts it." />
       <NewInterviewWizard
         initialMode={sp.mode === "human" ? "human" : sp.mode === "ai" ? "ai" : null}
         initialType={sp.type === "technical" || sp.type === "full" || sp.type === "behavioral" ? sp.type : null}

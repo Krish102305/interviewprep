@@ -21,12 +21,12 @@ const ACKS = [
   "Mm-hm. Thanks for that.",
   "Understood.",
   "Okay, that's helpful context.",
-  "Thanks — appreciate the detail.",
+  "Thanks, I appreciate the detail.",
 ];
 const ack = () => ACKS[Math.floor(Math.random() * ACKS.length)];
 
 const TRANSITIONS = ["", "", "Let's move on. ", "Okay, next one. ", "Switching gears a little. ", "Let me ask you something different. ", "Next question. "];
-/** A spoken bridge into the next planned question — varied so the interviewer doesn't sound scripted. */
+/** A spoken bridge into the next planned question, varied so the interviewer doesn't sound scripted. */
 export const transition = () => TRANSITIONS[Math.floor(Math.random() * TRANSITIONS.length)];
 
 // ---------------------------------------------------------------------------
@@ -43,14 +43,14 @@ export function ruleBasedFollowUp(question: QuestionForFollowUp, answer: string,
     if (!a.star.result)
       candidates.push({ text: "What was the outcome? If you can, put a number or concrete result on it.", rationale: "No clear result (STAR 'R')." });
     if (a.weStatements > a.iStatements + 1 || !a.star.action)
-      candidates.push({ text: "What did you personally do — as opposed to the team?", rationale: "Individual actions were unclear (STAR 'A')." });
+      candidates.push({ text: "What did you personally do, as opposed to the team?", rationale: "Individual actions were unclear (STAR 'A')." });
     if (!a.star.situation)
-      candidates.push({ text: "Can you set the scene a little — where were you and what was at stake?", rationale: "Missing context (STAR 'S')." });
+      candidates.push({ text: "Can you set the scene a little? Where were you and what was at stake?", rationale: "Missing context (STAR 'S')." });
   } else {
     if (a.keywordCoverage < 0.3)
       candidates.push({ text: question.followUps[0] ?? "Can you go one level deeper on how that works?", rationale: "Key concepts were not covered." });
     if (a.reasoningMarkers < 2)
-      candidates.push({ text: "Walk me through your reasoning — why that approach over the alternatives?", rationale: "Reasoning was not explained." });
+      candidates.push({ text: "Walk me through your reasoning. Why that approach over the alternatives?", rationale: "Reasoning was not explained." });
   }
   // Specific gaps first; a generic "more detail" probe only if nothing specific is missing.
   if (a.words < 45) candidates.push({ text: "Could you walk me through that in a bit more detail?", rationale: "The answer was brief." });
@@ -63,7 +63,7 @@ export function ruleBasedFollowUp(question: QuestionForFollowUp, answer: string,
 
 function ruleBasedNeedsFollowUp(question: QuestionForFollowUp, answer: string) {
   const a = analyzeAnswer(answer, question.keywords);
-  if (a.nonAnswer) return false; // don't badger a candidate who is stuck — move on
+  if (a.nonAnswer) return false; // don't badger a candidate who is stuck, move on
   if (["candidate_questions", "closing"].includes(question.category)) return false;
   if (a.words < 45) return true;
   if (["behavioral", "intro"].includes(question.category)) return !a.star.result || !a.star.action;
@@ -80,7 +80,7 @@ Ask a follow-up only when it adds real interview value: the answer was vague, mi
 
 Everything you write is spoken aloud by a voice in a live video interview, so write the way people talk: contractions, short sentences, no lists, no markdown, no emoji.
 
-The acknowledgement is a brief, natural, neutral spoken reaction — vary it ("Okay, got it.", "Mm-hm, thanks.", "Right, okay."). It may briefly reflect a concrete detail the candidate mentioned ("Okay — so the rollout slipped a week. Got it.") but never praises or critiques the answer, and never reveals scores. A follow-up should sound like a curious interviewer, e.g. "You mentioned the client pushed back — how did you handle that?"`;
+The acknowledgement is a brief, natural, neutral spoken reaction. Vary it ("Okay, got it.", "Mm-hm, thanks.", "Right, okay."). It may briefly reflect a concrete detail the candidate mentioned ("Okay, so the rollout slipped a week. Got it.") but never praises or critiques the answer, and never reveals scores. A follow-up should sound like a curious interviewer, e.g. "You mentioned the client pushed back, how did you handle that?"`;
 
 const TurnSchema = z.object({
   action: z.enum(["follow_up", "next"]),
@@ -129,7 +129,7 @@ export async function decideNextTurn(opts: {
 
 const SuggestSchema = z.object({ follow_up: z.string(), rationale: z.string() });
 
-/** "Generate Follow-Up" for human interviewers — always returns a suggestion. */
+/** "Generate Follow-Up" for human interviewers, always returns a suggestion. */
 export async function suggestFollowUp(opts: { ctx: TurnContext; question: QuestionForFollowUp; answer: string; alreadyAsked: string[] }) {
   if (isAiConfigured() && opts.answer.trim()) {
     try {
@@ -153,7 +153,7 @@ export async function suggestFollowUp(opts: { ctx: TurnContext; question: Questi
   }
   if (!opts.answer.trim()) {
     const text = opts.question.followUps.find((f) => !opts.alreadyAsked.includes(f)) ?? "Could you expand on that?";
-    return { text, rationale: "No answer captured yet — this is the plan's suggested probe.", engine: "fallback" as const };
+    return { text, rationale: "No answer captured yet. This is the plan's suggested probe.", engine: "fallback" as const };
   }
   const f = ruleBasedFollowUp(opts.question, opts.answer, opts.alreadyAsked);
   return { text: f.text, rationale: f.rationale, engine: "fallback" as const };
@@ -178,5 +178,5 @@ export async function replyToCandidateQuestions(opts: { ctx: TurnContext; answer
       if (!(err instanceof AiUnavailableError)) console.error("[ai] candidate reply failed", err);
     }
   }
-  return "Those are thoughtful questions — asking them shows you've prepared. Since this is a practice interview, note them down for your real interviewer; they're exactly the kind of questions that leave a good impression.";
+  return "Those are thoughtful questions. Asking them shows you've prepared. Since this is a practice interview, note them down for your real interviewer; they're exactly the kind of questions that leave a good impression.";
 }

@@ -12,13 +12,13 @@ export function EvidenceBlock({ evidence }: { evidence: string }) {
       {obj.conductEvents?.length ? (
         <div>
           <p className="font-semibold text-ink-700">Conduct signals</p>
-          <ul className="mt-1 space-y-0.5 text-ink-600">{obj.conductEvents.map((e, i) => <li key={i}>{new Date(e.at).toLocaleString()} — {e.type.replaceAll("_", " ")}{e.source ? ` (${e.source})` : ""}{e.details ? `: ${e.details}` : ""}</li>)}</ul>
+          <ul className="mt-1 space-y-0.5 text-ink-600">{obj.conductEvents.map((e, i) => <li key={i}>{new Date(e.at).toLocaleString()} · {e.type.replaceAll("_", " ")}{e.source ? ` (${e.source})` : ""}{e.details ? `: ${e.details}` : ""}</li>)}</ul>
         </div>
       ) : null}
       {obj.technicalEvents?.length ? (
         <div>
           <p className="font-semibold text-amber-800">Technical events (not misconduct)</p>
-          <ul className="mt-1 space-y-0.5 text-ink-600">{obj.technicalEvents.map((e, i) => <li key={i}>{new Date(e.at).toLocaleString()} — {e.type.replaceAll("_", " ")}{e.details ? `: ${e.details}` : ""}</li>)}</ul>
+          <ul className="mt-1 space-y-0.5 text-ink-600">{obj.technicalEvents.map((e, i) => <li key={i}>{new Date(e.at).toLocaleString()} · {e.type.replaceAll("_", " ")}{e.details ? `: ${e.details}` : ""}</li>)}</ul>
         </div>
       ) : null}
       {obj.note && <p className="text-ink-500">{obj.note}</p>}

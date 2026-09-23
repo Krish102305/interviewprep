@@ -11,7 +11,7 @@ import { track } from "./analytics";
  *
  * Every eligible interviewer gets a fit score (role, type, industry, experience,
  * timezone, rating, load). We then pick *randomly* among the top candidates,
- * weighted by score, and penalise recent repeat pairings — so students meet a
+ * weighted by score, and penalise recent repeat pairings, so students meet a
  * variety of interviewers, styles and backgrounds instead of the same person.
  */
 
@@ -267,7 +267,7 @@ export async function declineMatch(matchId: string, interviewerId: string) {
 
 /**
  * Bookable slots for a new human interview. Interviewer identity is withheld
- * until booking (random matching) — students see only type, industry and fit.
+ * until booking (random matching), students see only type, industry and fit.
  */
 export async function availableSlots(c: MatchCriteria, days = 14) {
   const ranked = await rankInterviewers(c);

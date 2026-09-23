@@ -38,7 +38,7 @@ export default async function AdminAppeals() {
                     <div className="rounded-lg bg-ink-50 p-3 text-sm"><p className="text-xs font-semibold text-ink-500">Original strike</p><p className="mt-1 text-ink-700">{a.strike.description}</p></div>
                     <div className="rounded-lg border border-olive-200 bg-olive-50 p-3 text-sm"><p className="text-xs font-semibold text-olive-800">Appeal: {a.reason}</p><p className="mt-1 text-ink-700">{a.description}</p></div>
                   </div>
-                  {a.reviewedBy && <p className="mt-3 text-xs text-ink-500">Reviewed by {fullName(a.reviewedBy.profile)}{a.reviewNote ? ` — “${a.reviewNote}”` : ""}</p>}
+                  {a.reviewedBy && <p className="mt-3 text-xs text-ink-500">Reviewed by {fullName(a.reviewedBy.profile)}{a.reviewNote ? `: “${a.reviewNote}”` : ""}</p>}
                 </div>
                 {a.status === "pending" && (
                   <div className="flex shrink-0 gap-2 lg:flex-col">

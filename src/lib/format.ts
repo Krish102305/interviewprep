@@ -3,7 +3,7 @@ export function fullName(p?: { firstName: string; lastName?: string | null } | n
   return [p.firstName, p.lastName].filter(Boolean).join(" ");
 }
 
-/** "Jordan K." — used wherever a full surname isn't necessary. */
+/** "Jordan K.", used wherever a full surname isn't necessary. */
 export function shortName(p?: { firstName: string; lastName?: string | null } | null) {
   if (!p) return "Member";
   return p.lastName ? `${p.firstName} ${p.lastName.charAt(0)}.` : p.firstName;
@@ -34,14 +34,14 @@ export function safeTz(tz?: string | null) {
 }
 
 export function formatDate(d: Date | string | null | undefined, timeZone?: string) {
-  if (!d) return "—";
+  if (!d) return "N/A";
   return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: safeTz(timeZone) }).format(
     new Date(d),
   );
 }
 
 export function formatDateTime(d: Date | string | null | undefined, timeZone?: string) {
-  if (!d) return "—";
+  if (!d) return "N/A";
   return new Intl.DateTimeFormat("en-US", {
     weekday: "short",
     month: "short",
@@ -73,7 +73,7 @@ export function scoreTone(score: number | null | undefined) {
 }
 
 export function scoreLabel(score: number | null | undefined) {
-  return { excellent: "Excellent", good: "Strong", fair: "Developing", low: "Needs work", neutral: "—" }[scoreTone(score)];
+  return { excellent: "Excellent", good: "Strong", fair: "Developing", low: "Needs work", neutral: "N/A" }[scoreTone(score)];
 }
 
 export function clamp(n: number, min = 0, max = 100) {

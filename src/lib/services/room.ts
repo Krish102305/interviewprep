@@ -35,7 +35,7 @@ export async function getRoomState(interviewId: string, user: SessionUser) {
     });
   }
 
-  // Both participants may be ready before the guide finishes generating — start once it is.
+  // Both participants may be ready before the guide finishes generating, start once it is.
   if (iv.mode === "human" && iv.status === "waiting" && iv.questionStatus === "ready" && iv.interviewerId) {
     const ready = await db.interviewSession.count({ where: { interviewId, ready: true, userId: { in: [iv.studentId, iv.interviewerId] } } });
     if (ready === 2) {
@@ -294,7 +294,7 @@ async function finishAi(iv: Iv, user: SessionUser) {
     iv.id,
     "interviewer",
     "closing",
-    `That concludes our interview. Thank you for your time, ${profile?.firstName ?? ""}. Your AI evaluation is being prepared now — you'll see detailed feedback in a moment.`.replace(" ,", ","),
+    `That concludes our interview. Thank you for your time, ${profile?.firstName ?? ""}. Your AI evaluation is being prepared now. You'll see detailed feedback in a moment.`.replace(" ,", ","),
   );
   await completeInterview(iv.id, "completed");
 }
@@ -359,7 +359,7 @@ export async function addCandidateSegment(interviewId: string, user: SessionUser
 
 export async function generateFollowUpSuggestion(interviewId: string, user: SessionUser) {
   const { iv } = await requireInterviewer(interviewId, user);
-  if (!iv.activeQuestionId) throw conflict("Ask a question first — follow-ups are based on the candidate's answer.");
+  if (!iv.activeQuestionId) throw conflict("Ask a question first. Follow-ups are based on the candidate's answer.");
   const active = await db.interviewQuestion.findUniqueOrThrow({ where: { id: iv.activeQuestionId } });
   const root = active.parentQuestionId ? await db.interviewQuestion.findUniqueOrThrow({ where: { id: active.parentQuestionId } }) : active;
   const [answers, asked] = await Promise.all([
@@ -469,7 +469,7 @@ export async function endInterview(interviewId: string, user: SessionUser, opts:
   }
   const elapsedMin = elapsedSeconds(iv) / 60;
   if (role === "candidate" && iv.mode === "human" && elapsedMin < iv.duration * 0.5) {
-    // Leaving early is a *potential* signal only — the interviewer may report it for review.
+    // Leaving early is a *potential* signal only, the interviewer may report it for review.
     await recordConductEvent({ userId: user.id, interviewId, type: "left_early", details: `Left after ${Math.round(elapsedMin)} of ${iv.duration} minutes${opts.reason ? `: ${opts.reason}` : ""}` });
   }
   if (iv.mode === "ai") {

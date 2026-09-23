@@ -150,3 +150,10 @@ describe("interviewer voice", () => {
     for (let i = 0; i < 50; i++) expect(transition()).toMatch(/^$|\S $/);
   });
 });
+
+describe("house style", () => {
+  it("strips em dashes from AI output, deeply", async () => {
+    const { withoutEmDashes } = await import("@/lib/ai/client");
+    expect(withoutEmDashes({ a: "Got it — thanks.", b: ["x—y", "1–2 minutes"] })).toEqual({ a: "Got it, thanks.", b: ["x, y", "1–2 minutes"] });
+  });
+});

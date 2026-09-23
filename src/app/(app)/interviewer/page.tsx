@@ -46,8 +46,8 @@ export default async function InterviewerDashboard() {
     db.availability.count({ where: { interviewerId: user.id, interviewId: null, startsAt: { gte: new Date() } } }),
     db.interview.count({ where: { interviewerId: user.id, status: "completed" } }),
   ]);
-  const avg = (k: "professionalism" | "realism" | "communication" | "feedbackQuality") => (ratings.length ? (ratings.reduce((s, r) => s + r[k], 0) / ratings.length).toFixed(1) : "—");
-  const overall = ratings.length ? (ratings.reduce((s, r) => s + (r.professionalism + r.realism + r.communication + r.feedbackQuality) / 4, 0) / ratings.length).toFixed(1) : "—";
+  const avg = (k: "professionalism" | "realism" | "communication" | "feedbackQuality") => (ratings.length ? (ratings.reduce((s, r) => s + r[k], 0) / ratings.length).toFixed(1) : "N/A");
+  const overall = ratings.length ? (ratings.reduce((s, r) => s + (r.professionalism + r.realism + r.communication + r.feedbackQuality) / 4, 0) / ratings.length).toFixed(1) : "N/A";
   const level = levelFor(points);
 
   return (
@@ -56,7 +56,7 @@ export default async function InterviewerDashboard() {
         <div>
           <p className="text-sm text-ink-300">{greeting(new Date(), tz)}, {user.profile?.firstName}</p>
           <h1 className="mt-1 text-3xl font-semibold sm:text-4xl">Ready to interview?</h1>
-          <p className="mt-2 max-w-lg text-sm text-ink-300">We prepare the interview guide — you bring real-world perspective and pressure.</p>
+          <p className="mt-2 max-w-lg text-sm text-ink-300">We prepare the interview guide. You bring real-world perspective and pressure.</p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <AvailableNowToggle on={profile.availableNow} />
@@ -66,7 +66,7 @@ export default async function InterviewerDashboard() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Interviews conducted" value={completedCount} sub={`${upcoming.length} upcoming · ${openSlots} open slots`} icon={<Users className="h-4 w-4" />} />
-        <StatCard label="Average rating" value={overall === "—" ? "—" : `${overall} / 5`} sub={`${ratings.length} rating${ratings.length === 1 ? "" : "s"}`} icon={<Star className="h-4 w-4" />} tone="olive" />
+        <StatCard label="Average rating" value={overall === "N/A" ? "N/A" : `${overall} / 5`} sub={`${ratings.length} rating${ratings.length === 1 ? "" : "s"}`} icon={<Star className="h-4 w-4" />} tone="olive" />
         <StatCard label="Points" value={points.toLocaleString()} sub={`Level ${level.level} · ${level.title}`} icon={<Trophy className="h-4 w-4" />} tone="olive" />
         <StandingCard strikes={strikes} accountStatus={user.accountStatus} />
       </div>
