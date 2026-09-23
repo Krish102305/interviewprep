@@ -127,8 +127,10 @@ The repo includes `railway.json`, so Railway knows how to build (`npm run build`
    - `APP_URL` = your public URL, e.g. `https://interview-connect.up.railway.app`
    - `ANTHROPIC_API_KEY` = your key
    - `STORAGE_DIR` = `/data/storage`
+   - `ELEVENLABS_API_KEY` = your key (optional — natural interviewer voices)
 4. On the app service, open **Settings → Volumes**, add a volume mounted at `/data` (keeps uploaded resumes across deploys), and under **Networking** click **Generate Domain**.
-5. Optional: load the demo accounts once with `railway run npm run db:seed` (Railway CLI), or leave the site empty for real users.
+5. Open your site, sign up with your own email, then make yourself admin (admin can never be chosen at sign-up): in the Railway CLI run `railway ssh`, then `npm run make-admin -- you@example.com`.
+6. Optional: load the demo accounts once with `railway run npm run db:seed` (Railway CLI), or leave the site empty for real users.
 
 Any Postgres URL works: the build detects `postgres://` and uses a generated Postgres copy of the schema. Local development keeps using SQLite.
 

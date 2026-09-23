@@ -14,7 +14,8 @@
     "postinstall": "node scripts/db.mjs generate",
     "setup": "node scripts/db.mjs db push && npm run db:seed",
     "test:e2e": "vitest run tests/e2e.test.ts",
-    "start:prod": "node scripts/db.mjs db push --skip-generate && next start"
+    "start:prod": "node scripts/db.mjs db push --skip-generate && next start",
+    "make-admin": "node scripts/make-admin.mjs"
   },
   "prisma": {
     "seed": "tsx --conditions=react-server prisma/seed.ts"
