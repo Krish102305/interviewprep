@@ -56,3 +56,11 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* AI interviewer idle motion (disabled automatically by prefers-reduced-motion above). */
+.ic-breathe { animation: ic-breathe 5s ease-in-out infinite; }
+.ic-sway { transform-origin: 640px 470px; animation: ic-sway 9s ease-in-out infinite; }
+.ic-nod { transform-origin: 640px 470px; animation: ic-nod 1.1s ease-in-out; }
+@keyframes ic-breathe { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+@keyframes ic-sway { 0%, 100% { transform: rotate(-0.9deg); } 50% { transform: rotate(0.9deg); } }
+@keyframes ic-nod { 0%, 100% { transform: rotate(0deg) translateY(0); } 35% { transform: rotate(0deg) translateY(7px); } 65% { transform: rotate(0deg) translateY(-1px); } }

@@ -16,6 +16,7 @@ import { generateFromBank, type GeneratedQuestion } from "../src/lib/ai/question
 import { gradeWithRubric } from "../src/lib/ai/grading";
 import { BADGES, POINTS } from "../src/lib/services/gamification";
 import { inferRoleCategory, type Difficulty, type InterviewType } from "../src/lib/constants";
+import { personaFor } from "../src/lib/ai/personas";
 
 const db = new PrismaClient();
 const DAY = 86400_000;
@@ -210,7 +211,7 @@ async function main() {
     let t = started.getTime();
     const tick = (s: number) => new Date((t += s * 1000));
     if (p.mode === "ai")
-      await db.transcriptEntry.create({ data: { interviewId: iv.id, speaker: "interviewer", kind: "intro", text: `Hi ${student.email.split("@")[0].replace(/^./, (c) => c.toUpperCase())}, I'm Ava, and I'll be your interviewer today. Let's begin.`, source: "ai", createdAt: tick(0) } });
+      await db.transcriptEntry.create({ data: { interviewId: iv.id, speaker: "interviewer", kind: "intro", text: `Hi ${student.email.split("@")[0].replace(/^./, (c) => c.toUpperCase())}, thanks for joining. I'm ${personaFor(roleCategory).firstName}, your AI interviewer today. Let's begin.`, source: "ai", createdAt: tick(0) } });
     const qa = [];
     for (const [i, q] of questions.entries()) {
       const qRow = await db.interviewQuestion.create({

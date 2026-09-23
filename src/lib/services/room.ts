@@ -5,12 +5,12 @@ import { FOLLOW_UPS_PER_QUESTION, LABELS } from "@/lib/constants";
 import { shortName } from "@/lib/format";
 import type { SessionUser } from "@/lib/auth/session";
 import { decideNextTurn, replyToCandidateQuestions, suggestFollowUp } from "@/lib/ai/followups";
+import { personaFor } from "@/lib/ai/personas";
 import { guideQuestion, loadForUser } from "./interviews";
 import { escalateIfRepeated, issueWarning, recordConductEvent } from "./conduct";
 import { track } from "./analytics";
 
 const PRESENCE_WINDOW_MS = 15_000;
-export const AI_INTERVIEWER_NAME = "Ava";
 
 type Iv = Awaited<ReturnType<typeof loadForUser>>["iv"];
 
@@ -98,7 +98,7 @@ export async function getRoomState(interviewId: string, user: SessionUser) {
     candidate: { id: iv.studentId, name: shortName(student?.profile), presence: presence(iv.studentId), school: isStaff ? student?.studentProfile?.school ?? null : undefined },
     interviewer:
       iv.mode === "ai"
-        ? { id: null, name: AI_INTERVIEWER_NAME, title: "AI Interviewer", presence: { ready: true, online: true, connectionState: "connected" } }
+        ? { id: null, name: personaFor(iv.roleCategory).firstName, title: `AI Interviewer · ${personaFor(iv.roleCategory).title}`, persona: personaFor(iv.roleCategory).key, presence: { ready: true, online: true, connectionState: "connected" } }
         : iv.interviewerId
           ? { id: iv.interviewerId, name: shortName(interviewer?.profile), title: interviewer?.interviewerProfile?.title ?? LABELS.interviewerType[interviewer?.interviewerProfile?.interviewerType ?? "professional"], presence: presence(iv.interviewerId) }
           : null,
@@ -199,7 +199,7 @@ export async function aiStart(interviewId: string, user: SessionUser) {
     interviewId,
     "interviewer",
     "intro",
-    `Hi ${profile?.firstName ?? "there"}, I'm ${AI_INTERVIEWER_NAME}, and I'll be your interviewer today. This is a ${iv.duration}-minute ${LABELS.type[iv.type].toLowerCase()} for the ${iv.targetRole} role${company}. I'll ask one question at a time and may follow up on your answers. Take a moment to think whenever you need to — answer just as you would in a real interview. Let's begin.`,
+    `Hi ${profile?.firstName ?? "there"}, thanks for joining. I'm ${personaFor(iv.roleCategory).firstName}, your AI interviewer today. This is a ${iv.duration}-minute ${LABELS.type[iv.type].toLowerCase()} for the ${iv.targetRole} role${company}. I'll ask one question at a time and may follow up on your answers. Take a moment to think whenever you need to, and answer just as you would in a real interview. Let's begin.`,
   );
   await say(interviewId, "interviewer", "question", first.text, first.id);
   await markAsked(interviewId, first.id, 0);

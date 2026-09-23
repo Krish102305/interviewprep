@@ -99,14 +99,70 @@ export function useSpeechRecognition(onFinal: (text: string) => void) {
   return { supported, listening, interim, error, start, stop };
 }
 
-/** Text-to-speech for the AI interviewer's voice (browser speechSynthesis). */
-export function speak(text: string, enabled: boolean) {
-  if (!enabled || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+/** Pick the best available voice for a persona (voices load asynchronously in some browsers). */
+function pickVoice(hints: string[], gender?: "female" | "male") {
+  const voices = window.speechSynthesis.getVoices().filter((v) => v.lang.toLowerCase().startsWith("en"));
+  for (const h of hints) {
+    const v = voices.find((x) => x.name.toLowerCase().includes(h.toLowerCase()));
+    if (v) return v;
+  }
+  if (gender) {
+    const v = voices.find((x) => x.name.toLowerCase().includes(gender));
+    if (v) return v;
+  }
+  return voices.find((v) => /en-US/i.test(v.lang)) ?? voices[0];
+}
+
+export type SpeakOptions = {
+  voiceHints?: string[];
+  gender?: "female" | "male";
+  onStart?: () => void;
+  onEnd?: () => void;
+  /** Fires on each spoken word (where the browser supports it) — used for lip-sync. */
+  onWord?: () => void;
+};
+
+/**
+ * Text-to-speech for the AI interviewer's voice (browser speechSynthesis).
+ * When muted or unsupported, onStart/onEnd still fire over an estimated
+ * duration so the on-screen interviewer keeps "talking" with captions.
+ */
+export function speak(text: string, enabled: boolean, opts: SpeakOptions = {}) {
+  const estimateMs = Math.min(25000, 500 + text.split(/\s+/).length * 340);
+  const silent = () => {
+    opts.onStart?.();
+    const t = setTimeout(() => opts.onEnd?.(), estimateMs);
+    return () => clearTimeout(t);
+  };
+  if (typeof window === "undefined") return () => {};
+  if (!enabled || !("speechSynthesis" in window)) return silent();
+
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.rate = 1;
-  u.pitch = 1;
-  const voice = window.speechSynthesis.getVoices().find((v) => /en-(US|GB)/.test(v.lang) && /Google|Samantha|Natural|Aria|Jenny/i.test(v.name));
+  u.pitch = opts.gender === "male" ? 0.95 : 1.02;
+  const voice = pickVoice(opts.voiceHints ?? [], opts.gender);
   if (voice) u.voice = voice;
+  let ended = false;
+  const finish = () => {
+    if (ended) return;
+    ended = true;
+    clearTimeout(safety);
+    opts.onEnd?.();
+  };
+  u.onstart = () => opts.onStart?.();
+  u.onend = finish;
+  u.onerror = finish;
+  u.onboundary = (e) => {
+    if (e.name === "word" || e.name === undefined) opts.onWord?.();
+  };
+  // Some browsers never fire onend (e.g. tab backgrounded) — don't leave the mouth moving.
+  const safety = setTimeout(finish, estimateMs * 2 + 4000);
+  opts.onStart?.();
   window.speechSynthesis.speak(u);
+  return () => {
+    clearTimeout(safety);
+    window.speechSynthesis.cancel();
+    finish();
+  };
 }

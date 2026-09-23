@@ -9,6 +9,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Badge, toneForStatus } from "@/components/ui/badge";
 import { ScorePill } from "@/components/ui/score";
 import { TranscriptView } from "@/components/room/transcript-view";
+import { aiInterviewerLabel } from "@/lib/ai/personas";
 import { GuideList } from "@/components/interviews/guide-list";
 
 export const metadata: Metadata = { title: "Interview · Admin" };
@@ -74,7 +75,7 @@ export default async function AdminInterviewDetail({ params }: { params: Promise
         </Card>
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card><CardHeader title="Transcript" /><CardBody><TranscriptView entries={iv.transcript} interviewerName={iv.mode === "ai" ? "Ava (AI)" : fullName(iv.interviewer?.profile)} candidateName={fullName(iv.student.profile)} className="max-h-[600px]" /></CardBody></Card>
+        <Card><CardHeader title="Transcript" /><CardBody><TranscriptView entries={iv.transcript} interviewerName={iv.mode === "ai" ? aiInterviewerLabel(iv.roleCategory) : fullName(iv.interviewer?.profile)} candidateName={fullName(iv.student.profile)} className="max-h-[600px]" /></CardBody></Card>
         <Card><CardHeader title="Question plan" /><CardBody><GuideList questions={iv.questions} /></CardBody></Card>
       </div>
     </div>

@@ -18,6 +18,7 @@ import { AutoRefresh } from "@/components/interviews/auto-refresh";
 import { RatingForm } from "@/components/results/rating-form";
 import { RegradeButton } from "@/components/results/regrade-button";
 import { TranscriptView } from "@/components/room/transcript-view";
+import { aiInterviewerLabel, personaFor } from "@/lib/ai/personas";
 
 export const metadata: Metadata = { title: "Interview results" };
 
@@ -44,7 +45,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
   if (!["completed", "reported"].includes(iv.status)) redirect(`/interviews/${id}`);
   const pointsEarned = await db.pointsEntry.aggregate({ where: { interviewId: id, userId: iv.studentId }, _sum: { amount: true } });
   const ev = iv.evaluation;
-  const interviewerName = iv.mode === "ai" ? "AI Interviewer" : shortName(iv.interviewer?.profile);
+  const interviewerName = iv.mode === "ai" ? `${personaFor(iv.roleCategory).name} (AI Interviewer)` : shortName(iv.interviewer?.profile);
   const header = (
     <div className="mb-8">
       <p className="eyebrow">{LABELS.mode[iv.mode]} · {LABELS.type[iv.type]} · {formatDate(iv.completedAt, user.profile?.timezone)}</p>
@@ -82,7 +83,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
         {iv.transcript.length > 0 && (
           <Card className="mt-6">
             <CardHeader title="Transcript" />
-            <CardBody><TranscriptView entries={iv.transcript} interviewerName={iv.mode === "ai" ? "Ava (AI)" : interviewerName} candidateName="You" /></CardBody>
+            <CardBody><TranscriptView entries={iv.transcript} interviewerName={iv.mode === "ai" ? aiInterviewerLabel(iv.roleCategory) : interviewerName} candidateName="You" /></CardBody>
           </Card>
         )}
       </div>
@@ -206,7 +207,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
       <details className="group mt-6 rounded-2xl border border-ink-200 bg-white shadow-card">
         <summary className="cursor-pointer list-none px-6 py-4 text-[15px] font-semibold text-ink-900">Full transcript <span className="ml-1 text-sm font-normal text-ink-500">({iv.transcript.length} entries)</span></summary>
         <div className="border-t border-ink-100 px-6 py-5">
-          <TranscriptView entries={iv.transcript} interviewerName={iv.mode === "ai" ? "Ava (AI)" : interviewerName} candidateName="You" />
+          <TranscriptView entries={iv.transcript} interviewerName={iv.mode === "ai" ? aiInterviewerLabel(iv.roleCategory) : interviewerName} candidateName="You" />
         </div>
       </details>
     </div>
