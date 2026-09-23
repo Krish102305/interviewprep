@@ -95,6 +95,11 @@ export const createInterviewSchema = z
       ctx.addIssue({ code: "custom", message: "Pick an available time slot", path: ["availabilityId"] });
   });
 
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().max(200).default(""),
+  newPassword: signupSchema.shape.password,
+});
+
 export const answerSchema = z.object({
   text: z.string().trim().min(1, "Your answer is empty").max(8000),
   source: z.enum(["speech", "typed"]).default("typed"),

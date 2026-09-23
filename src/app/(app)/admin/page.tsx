@@ -32,6 +32,7 @@ export default async function AdminHome() {
     db.adminAction.findMany({ orderBy: { createdAt: "desc" }, take: 10, include: { admin: { select: { profile: true } }, targetUser: { select: { email: true } } } }),
   ]);
   const integrations = [
+    { name: "Database (PostgreSQL)", ok: /^postgres(ql)?:\/\//.test(process.env.DATABASE_URL ?? ""), env: "DATABASE_URL" },
     { name: "AI (Claude)", ok: isAiConfigured(), env: "ANTHROPIC_API_KEY" },
     { name: "Google OAuth", ok: isGoogleConfigured(), env: "GOOGLE_CLIENT_ID / SECRET" },
     { name: "Email (Resend)", ok: isEmailConfigured(), env: "RESEND_API_KEY" },

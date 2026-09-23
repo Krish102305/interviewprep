@@ -80,7 +80,7 @@ async function main() {
   console.log("Resetting demo data…");
   // Order matters for FK constraints in SQLite.
   for (const m of [
-    "rtcSignal", "analyticsEvent", "rateLimit", "adminAction", "appeal", "strike", "conductReport", "conductEvent", "technicalEvent", "notification", "userBadge", "badge",
+    "questionRetry", "rtcSignal", "analyticsEvent", "rateLimit", "adminAction", "appeal", "strike", "conductReport", "conductEvent", "technicalEvent", "notification", "userBadge", "badge",
     "pointsEntry", "availability", "match", "interviewerRating", "interviewerNote", "aiEvaluation", "interviewFeedback", "transcriptEntry", "interviewSession", "interviewAnswer",
     "interviewQuestion", "interview", "jobDescription", "resume", "studentProfile", "interviewerProfile", "profile", "oAuthAccount", "session", "user",
   ] as const) {

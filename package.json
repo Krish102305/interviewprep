@@ -15,7 +15,8 @@
     "setup": "node scripts/db.mjs db push && npm run db:seed",
     "test:e2e": "vitest run tests/e2e.test.ts",
     "start:prod": "node scripts/db.mjs db push --skip-generate && next start",
-    "make-admin": "node scripts/make-admin.mjs"
+    "make-admin": "node scripts/make-admin.mjs",
+    "reset-password": "node scripts/reset-password.mjs"
   },
   "prisma": {
     "seed": "tsx --conditions=react-server prisma/seed.ts"

@@ -14,7 +14,7 @@ const DEMO = [
   { label: "Admin", email: "admin@demo.interviewconnect.app" },
 ];
 
-export function LoginForm({ googleEnabled, initialError, next }: { googleEnabled: boolean; initialError?: string; next?: string }) {
+export function LoginForm({ googleEnabled, initialError, next, showDemo = false }: { googleEnabled: boolean; initialError?: string; next?: string; showDemo?: boolean }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,6 +53,7 @@ export function LoginForm({ googleEnabled, initialError, next }: { googleEnabled
       <p className="mt-6 text-center text-sm text-ink-500">
         New to Interview Connect? <Link href="/signup" className="font-medium text-ink-900 underline-offset-4 hover:underline">Create an account</Link>
       </p>
+      {showDemo && (
       <div className="mt-10 rounded-xl border border-dashed border-ink-200 bg-white p-4">
         <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">Demo accounts</p>
         <p className="mt-1 text-xs text-ink-500">Password for all demo accounts: <code className="rounded bg-ink-100 px-1">demo1234</code></p>
@@ -64,6 +65,7 @@ export function LoginForm({ googleEnabled, initialError, next }: { googleEnabled
           ))}
         </div>
       </div>
+      )}
     </div>
   );
 }

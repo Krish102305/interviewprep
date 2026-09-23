@@ -27,6 +27,19 @@ function databaseUrl() {
 
 const url = databaseUrl();
 const isPostgres = /^postgres(ql)?:\/\//.test(url);
+
+// On a hosting platform the server's own disk is wiped on every deploy, so a
+// SQLite file there silently loses every account and interview. Refuse to run.
+const hosted = Boolean(process.env.RAILWAY_ENVIRONMENT_ID || process.env.RAILWAY_ENVIRONMENT_NAME || process.env.RAILWAY_ENVIRONMENT);
+if (hosted && !isPostgres && !process.env.ALLOW_SQLITE_ON_HOST) {
+  console.error(`
+[db] ERROR: DATABASE_URL is not a PostgreSQL URL (it starts with "${url.slice(0, 8) || "(empty)"}").
+[db] On Railway the server's files are deleted on every deploy, so all accounts would be lost.
+[db] Fix: in Railway → your app service → Variables, set
+[db]     DATABASE_URL = \${{Postgres.DATABASE_URL}}
+`);
+  process.exit(1);
+}
 let schema = path.join(root, "prisma", "schema.prisma");
 
 if (isPostgres) {

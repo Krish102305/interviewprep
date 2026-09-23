@@ -113,6 +113,19 @@ afterAll(async () => {
 });
 
 describe("authentication & roles", () => {
+  it("changes a password: needs the current one, signs out other devices", async () => {
+    const c = await newStudent("pw-change");
+    const other = new Client();
+    expect((await other.post("/api/auth/login", { email: "pw-change@test.dev", password: "testpass1" })).status).toBe(200);
+    expect((await c.post("/api/profile/password", { currentPassword: "nope", newPassword: "newpass22" })).status).toBe(400);
+    expect((await c.post("/api/profile/password", { currentPassword: "testpass1", newPassword: "short" })).status).toBe(400);
+    expect((await c.post("/api/profile/password", { currentPassword: "testpass1", newPassword: "newpass22" })).status).toBe(200);
+    expect((await c.get("/api/notifications")).status).toBe(200); // this device stays signed in
+    expect((await other.get("/api/notifications")).status).toBe(401); // other devices are signed out
+    expect((await new Client().post("/api/auth/login", { email: "pw-change@test.dev", password: "testpass1" })).status).toBe(401);
+    expect((await new Client().post("/api/auth/login", { email: "pw-change@test.dev", password: "newpass22" })).status).toBe(200);
+  });
+
   it("rejects admin self-signup and bad credentials", async () => {
     const c = new Client();
     expect((await c.post("/api/auth/signup", { email: "x@test.dev", password: "abcdefg1", firstName: "X", role: "admin" })).status).toBe(400);

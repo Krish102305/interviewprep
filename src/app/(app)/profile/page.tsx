@@ -8,6 +8,7 @@ import { parseJsonArray } from "@/lib/json";
 import { BADGES, levelFor, totalPoints } from "@/lib/services/gamification";
 import { getPerformance } from "@/lib/services/performance";
 import { Card, CardBody, CardHeader, StatCard } from "@/components/ui/card";
+import { PasswordForm } from "@/components/profile/password-form";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/cn";
@@ -20,6 +21,7 @@ const ICONS = { sparkles: Sparkles, layers: Layers, trophy: Trophy, message: Mes
 
 export default async function ProfilePage() {
   const user = await requirePageUser({ roles: ["student", "interviewer"] });
+  const hasPassword = Boolean((await db.user.findUnique({ where: { id: user.id }, select: { passwordHash: true } }))?.passwordHash);
   const [points, earned, sp, ip, resumes, pointsLog] = await Promise.all([
     totalPoints(user.id),
     db.userBadge.findMany({ where: { userId: user.id }, include: { badge: true } }),
@@ -119,6 +121,10 @@ export default async function ProfilePage() {
               <CardBody><ProfileForm initial={{ firstName: user.profile?.firstName ?? "", lastName: user.profile?.lastName ?? "", location: user.profile?.location ?? "", bio: user.profile?.bio ?? "", timezone: user.profile?.timezone ?? "America/New_York" }} /></CardBody>
             </Card>
           )}
+          <Card>
+            <CardHeader title="Password" description="Changing it signs you out on every other device." />
+            <CardBody><PasswordForm hasPassword={hasPassword} /></CardBody>
+          </Card>
         </div>
         <div className="space-y-6">
           <Card>
