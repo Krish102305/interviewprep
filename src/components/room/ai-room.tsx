@@ -70,11 +70,28 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
     bump();
   };
 
+  // True from the moment the interviewer starts talking until shortly after they stop,
+  // so their voice coming out of the speakers is never transcribed as the answer.
+  const interviewerTalking = useRef(false);
+  const echoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const interviewerStarts = () => {
+    if (echoTimer.current) clearTimeout(echoTimer.current);
+    interviewerTalking.current = true;
+    setSpeaking(true);
+  };
+  const interviewerStops = () => {
+    if (echoTimer.current) clearTimeout(echoTimer.current);
+    echoTimer.current = setTimeout(() => {
+      interviewerTalking.current = false;
+      setSpeaking(false);
+    }, 450); // let the last word's echo die away before the mic opens
+  };
+
   const speech = useSpeechRecognition((t) => {
     setDraft((d) => (d ? `${d} ${t}` : t));
     setUsedSpeech(true);
     heard();
-  });
+  }, interviewerTalking);
   useEffect(() => {
     if (speech.interim) heard();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -116,7 +133,8 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
       setChunkIdx(0);
       wordsSpoken.current = { boundary: 0, startedAt: Date.now() };
       stopSpeech.current?.();
-      setSpeaking(true); // covers the moment before audio starts, so listening doesn't flicker on
+      interviewerStarts(); // before audio starts, so the mic never opens in between
+      speech.abort();
       stopSpeech.current = speak(text, voiceOn, {
         voiceHints: persona.voiceHints,
         gender: persona.gender,
@@ -125,9 +143,9 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
         onFallback: audioUrl ? onVoiceFallback(audioUrl) : undefined,
         onStart: () => {
           wordsSpoken.current = { boundary: 0, startedAt: Date.now() };
-          setSpeaking(true);
+          interviewerStarts();
         },
-        onEnd: () => setSpeaking(false),
+        onEnd: interviewerStops,
         onWord: () => {
           wordsSpoken.current.boundary += 1;
           setPulse((p) => p + 1);
@@ -209,10 +227,11 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
   const autoListen = handsFree && speech.supported && !speech.error && media.micOn;
   useEffect(() => {
     if (!autoListen) return;
-    if (canAnswer && !speaking) {
+    if (canAnswer && !speaking && !interviewerTalking.current) {
       lastVoiceAt.current = Date.now();
       speech.start();
-    } else speech.stop();
+    } else if (speaking) speech.abort();
+    else speech.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoListen, canAnswer, speaking]);
   useEffect(() => {
@@ -306,10 +325,10 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
       gender: persona.gender,
       audioUrl: naturalVoice ? `/api/interviews/${id}/tts?phrase=${key}` : undefined,
       mouthRef: mouthLevel,
-      onStart: () => setSpeaking(true),
+      onStart: interviewerStarts,
       onEnd: () => {
         backchannelUntil.current = 0;
-        setSpeaking(false);
+        interviewerStops();
       },
     });
   }

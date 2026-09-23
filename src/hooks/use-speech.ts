@@ -27,7 +27,7 @@ function getCtor(): (new () => SpeechRecognitionLike) | null {
  * Edge, Safari). Where it's unsupported, `supported` is false and the UI offers
  * typed answers instead — we never fabricate a transcript.
  */
-export function useSpeechRecognition(onFinal: (text: string) => void) {
+export function useSpeechRecognition(onFinal: (text: string) => void, ignore?: { current: boolean }) {
   const [supported, setSupported] = useState(false);
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState("");
@@ -36,6 +36,8 @@ export function useSpeechRecognition(onFinal: (text: string) => void) {
   const want = useRef(false);
   const cb = useRef(onFinal);
   cb.current = onFinal;
+  const ignoreRef = useRef(ignore);
+  ignoreRef.current = ignore;
 
   useEffect(() => {
     setSupported(Boolean(getCtor()));
@@ -51,6 +53,8 @@ export function useSpeechRecognition(onFinal: (text: string) => void) {
     r.interimResults = true;
     r.lang = "en-US";
     r.onresult = (e) => {
+      // Drop anything heard while muted (e.g. the interviewer's own voice from the speakers).
+      if (ignoreRef.current?.current) return setInterim("");
       let interimText = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const res = e.results[i];
@@ -95,8 +99,16 @@ export function useSpeechRecognition(onFinal: (text: string) => void) {
     setListening(false);
   }, []);
 
+  /** Stop immediately and discard anything not yet final. */
+  const abort = useCallback(() => {
+    want.current = false;
+    rec.current?.abort();
+    setInterim("");
+    setListening(false);
+  }, []);
+
   useEffect(() => () => { want.current = false; rec.current?.abort(); }, []);
-  return { supported, listening, interim, error, start, stop };
+  return { supported, listening, interim, error, start, stop, abort };
 }
 
 /** Pick the best available voice for a persona (voices load asynchronously in some browsers). */
