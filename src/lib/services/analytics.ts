@@ -17,6 +17,7 @@ export type AnalyticsName =
   | "interview_no_show"
   | "feedback_submitted"
   | "rating_submitted"
+  | "question_retried"
   | "interviewer_accepted"
   | "points_earned"
   | "badge_earned"

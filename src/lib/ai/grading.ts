@@ -346,3 +346,139 @@ export async function gradeInterview(input: GradingInput): Promise<EvaluationRes
     throw err;
   }
 }
+
+// ---------------------------------------------------------------------------
+// "Practice this question again": grade one new attempt against the original
+// ---------------------------------------------------------------------------
+
+export type RetryInput = {
+  type: InterviewType;
+  targetRole: string;
+  roleCategory: string;
+  company?: string | null;
+  difficulty: string;
+  qa: QAPair; // qa.answer is the NEW answer
+  originalAnswer: string;
+  originalScore: number | null;
+  originalFeedback: string | null;
+};
+
+export type RetryResult = {
+  engine: "ai" | "fallback";
+  score: number;
+  feedback: string;
+  improved: string[];
+  nextSteps: string[];
+  star: { situation: boolean; task: boolean; action: boolean; result: boolean } | null;
+};
+
+const STAR_KEYS = ["situation", "task", "action", "result"] as const;
+
+/** Rule-based comparison using the same rubric that scored the original answer. */
+export function gradeRetryWithRubric(input: RetryInput): RetryResult {
+  const p = input.qa;
+  const now = analyzeAnswer(p.answer, p.keywords) as Analysed["a"];
+  const before = analyzeAnswer(input.originalAnswer, p.keywords) as Analysed["a"];
+  const qMarks = (t: string) => (t.match(/\?/g) ?? []).length + (/(what|how|could you|can you|do you)\b/i.test(t) ? 1 : 0);
+  now.answer_questionMarks = qMarks(p.answer);
+  const score = scoreAnswer(p, now);
+  const behavioral = BEHAVIORAL_CATS.has(p.category);
+
+  const improved: string[] = [];
+  const nextSteps: string[] = [];
+  if (behavioral) {
+    const added = STAR_KEYS.filter((k) => now.star[k] && !before.star[k]);
+    if (added.length) improved.push(`You added the ${added.join(" and ")} to your story.`);
+    const missing = STAR_KEYS.filter((k) => !now.star[k]);
+    if (missing.length) nextSteps.push(`Make the ${missing.join(" and ")} explicit.`);
+    if (now.iStatements > now.weStatements && before.iStatements <= before.weStatements) improved.push(`You focused on what you personally did ("I"), not just the team.`);
+  } else if (p.keywords.length) {
+    const gained = now.keywordHits.filter((k) => !before.keywordHits.includes(k));
+    if (gained.length) improved.push(`You now cover ${gained.slice(0, 4).join(", ")}.`);
+    const stillMissing = p.keywords.filter((k) => !now.keywordHits.includes(k.toLowerCase())).slice(0, 3);
+    if (stillMissing.length && now.keywordCoverage < 0.6) nextSteps.push(`A strong answer would also cover ${stillMissing.join(", ")}.`);
+    if (now.reasoningMarkers >= 2 && before.reasoningMarkers < 2) improved.push("You explained your reasoning step by step.");
+    else if (now.reasoningMarkers < 2) nextSteps.push("Walk through your reasoning explicitly (first, then, because).");
+  }
+  if (now.hasNumbers && !before.hasNumbers) improved.push("You added a concrete number or outcome.");
+  else if (!now.hasNumbers && behavioral) nextSteps.push("Add a concrete number or outcome.");
+  if (now.fillerRate < before.fillerRate - 0.02 && before.fillerRate > 0.05) improved.push("You used noticeably fewer filler words.");
+  else if (now.fillerRate > 0.05) nextSteps.push(`Cut filler words ("um", "like"). A short silent pause sounds more confident.`);
+  if (now.hedgeCount < before.hedgeCount && before.hedgeCount >= 2) improved.push("You sounded more certain, with less hedging.");
+  if (now.words < 40) nextSteps.push("Develop the answer more. Aim for 1 to 2 minutes with context, actions and results.");
+  else if (before.words < 40) improved.push("Your answer is fuller and better developed.");
+  if (now.words > 320) nextSteps.push("Tighten it up. Lead with the point and cut side details.");
+
+  const delta = input.originalScore != null ? score - input.originalScore : null;
+  const feedback = !p.answer.trim()
+    ? "No answer was captured."
+    : delta == null
+      ? `This attempt scored ${score}.`
+      : delta > 0
+        ? `Nice improvement: ${delta} points higher than your original answer.`
+        : delta === 0
+          ? "Same score as your original answer. Use the notes below to push it higher."
+          : `This attempt scored ${-delta} points lower than your original. Compare the two answers and try again.`;
+
+  return {
+    engine: "fallback",
+    score,
+    feedback,
+    improved: improved.slice(0, 4),
+    nextSteps: nextSteps.slice(0, 4),
+    star: behavioral && p.answer.trim() ? now.star : null,
+  };
+}
+
+const RetrySchema = z.object({
+  score: z.number().int().min(0).max(100),
+  feedback: z.string(),
+  improved: z.array(z.string()),
+  next_steps: z.array(z.string()),
+  star: z.object({ situation: z.boolean(), task: z.boolean(), action: z.boolean(), result: z.boolean() }).nullable(),
+});
+
+const RETRY_SYSTEM = `You are the standardized grading engine for Interview Connect. A candidate is re-attempting ONE question from a graded practice interview to improve their answer.
+
+Score the NEW answer on exactly the same 0–100 scale and rubric used for the original (90–100 exceptional · 75–89 strong, interview-ready · 60–74 developing · 40–59 weak · below 40 missing or off-target). The original answer and its score are given for calibration: an answer of the same quality must get the same score, a better one a higher score, a worse one a lower score. Be consistent and honest; do not inflate the score just because it is a retry.
+
+Return:
+- feedback: 1–2 sentences to the candidate ("you") on how this attempt compares with the original.
+- improved: 0–3 specific things that got better compared with the original (empty if nothing did).
+- next_steps: 1–3 specific, actionable things to improve next.
+- star: for behavioral questions, which STAR components the NEW answer clearly covers; null for other questions.
+Ground everything in what the candidate actually said. Never fabricate quotes.`;
+
+export async function gradeRetry(input: RetryInput): Promise<RetryResult> {
+  if (!isAiConfigured()) return gradeRetryWithRubric(input);
+  const p = input.qa;
+  try {
+    const r = await generateStructured({
+      system: RETRY_SYSTEM,
+      effort: "low",
+      maxTokens: 4000,
+      schema: RetrySchema,
+      prompt: [
+        `<interview type="${input.type}" difficulty="${input.difficulty}">Target role: ${input.targetRole} (${roleCategoryLabel(input.roleCategory)})${input.company ? ` at ${input.company}` : ""}</interview>`,
+        `<question category="${p.category}" tests="${p.whatItTests}">${p.question}</question>`,
+        `<criteria>${p.gradingCriteria.join("; ")}</criteria>`,
+        `<original_answer score="${input.originalScore ?? "unknown"}">${input.originalAnswer.trim() || "(no answer captured)"}</original_answer>`,
+        input.originalFeedback ? `<original_feedback>${input.originalFeedback}</original_feedback>` : "",
+        `<new_answer>${p.answer.trim() || "(no answer captured)"}</new_answer>`,
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    });
+    return {
+      engine: "ai",
+      score: r.score,
+      feedback: r.feedback,
+      improved: r.improved.slice(0, 3),
+      nextSteps: r.next_steps.slice(0, 3),
+      star: BEHAVIORAL_CATS.has(p.category) ? r.star : null,
+    };
+  } catch (err) {
+    if (!(err instanceof AiUnavailableError)) console.error("[ai] retry grading failed, using development rubric", err);
+    return gradeRetryWithRubric(input);
+  }
+}

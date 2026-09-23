@@ -60,6 +60,7 @@ model User {
   ratingsGiven            InterviewerRating[] @relation("RatingBy")
   ratingsReceived         InterviewerRating[] @relation("RatingFor")
   feedbackGiven           InterviewFeedback[]
+  questionRetries         QuestionRetry[]
 
   @@index([role])
   @@index([accountStatus])
@@ -274,6 +275,7 @@ model Interview {
   technicalEvents  TechnicalEvent[]
   strikes          Strike[]
   signals          RtcSignal[]
+  retries          QuestionRetry[]
 
   @@index([studentId, status])
   @@index([interviewerId, status])
@@ -308,6 +310,7 @@ model InterviewQuestion {
   createdAt        DateTime          @default(now())
   interview        Interview         @relation(fields: [interviewId], references: [id], onDelete: Cascade)
   answers          InterviewAnswer[]
+  retries          QuestionRetry[]
 
   @@index([interviewId, order])
   @@map("interview_questions")
@@ -717,4 +720,37 @@ model RateLimit {
   resetAt DateTime
 
   @@map("rate_limits")
+}
+
+/// "Practice this question again": a new attempt at one question from a graded
+/// interview, scored on the same rubric and compared with the original answer.
+model QuestionRetry {
+  id            String            @id @default(cuid())
+  userId        String
+  interviewId   String
+  questionId    String
+  answer        String
+  /// speech | typed
+  source        String            @default("typed")
+  durationSec   Int?
+  score         Int
+  /// Score of the original answer when the retry was made (for the comparison)
+  originalScore Int?
+  feedback      String
+  /// JSON string[]: what got better vs the original answer
+  improved      String            @default("[]")
+  /// JSON string[]: what to work on next
+  nextSteps     String            @default("[]")
+  /// JSON {situation,task,action,result} for behavioral questions
+  star          String?
+  /// ai | fallback
+  engine        String
+  createdAt     DateTime          @default(now())
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interview     Interview         @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  question      InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([interviewId, questionId])
+  @@map("question_retries")
 }

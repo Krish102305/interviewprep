@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { ArrowRight, Bot, CheckCircle2, Info, Lightbulb, MessageSquareQuote, Sparkles, Target, TrendingUp, Trophy, Users } from "lucide-react";
+import { ArrowRight, Bot, CheckCircle2, Info, Lightbulb, MessageSquareQuote, RotateCcw, Sparkles, Target, TrendingUp, Trophy, Users } from "lucide-react";
 import { db } from "@/lib/db";
 import { requirePageUser } from "@/lib/auth/guards";
 import { CATEGORIES_BY_TYPE, LABELS, SCORE_CATEGORIES, type InterviewType } from "@/lib/constants";
@@ -102,6 +102,14 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
     select: { overallScore: true },
   });
   const delta = prior?.overallScore != null ? ev.overallScore - prior.overallScore : null;
+  // "Practice this question again" (candidate only): best retry per question + the weakest answer to start with.
+  const canPractice = ctx.role === "candidate";
+  const bestRetry = new Map(
+    canPractice
+      ? (await db.questionRetry.groupBy({ by: ["questionId"], where: { interviewId: iv.id, userId: user.id }, _max: { score: true } })).map((r) => [r.questionId, r._max.score])
+      : [],
+  );
+  const weakest = qf.length ? qf.reduce((w, q) => (q.score < w.score ? q : w)) : null;
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -140,6 +148,12 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
           <CardHeader title={<span className="flex items-center gap-2"><Target className="h-4 w-4 text-amber-600" /> Areas to improve</span>} />
           <CardBody>
             {improvements.length ? <ul className="space-y-3 text-sm leading-relaxed text-ink-700">{improvements.map((s) => <li key={s} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />{s}</li>)}</ul> : <p className="text-sm text-ink-500">Nothing major, keep practicing at a higher difficulty.</p>}
+            {canPractice && weakest && weakest.score < 85 && (
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-amber-50/70 px-4 py-3">
+                <p className="text-sm text-ink-700">Your weakest answer scored <strong>{weakest.score}</strong>. Try it again and see the difference.</p>
+                <ButtonLink href={`/interviews/${iv.id}/practice/${weakest.questionId}`} size="sm"><RotateCcw className="h-3.5 w-3.5" /> Practice it again</ButtonLink>
+              </div>
+            )}
           </CardBody>
         </Card>
       </div>
@@ -170,8 +184,8 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
         )}
       </div>
 
-      <Card className="mt-6">
-        <CardHeader title="Question-by-question feedback" description="Scores and feedback grounded in what you actually said." />
+      <Card className="mt-6 scroll-mt-6" id="questions">
+        <CardHeader title="Question-by-question feedback" description={canPractice ? "Scores and feedback grounded in what you actually said. Practice any question again to improve it." : "Scores and feedback grounded in what you actually said."} />
         <CardBody>
           <ol className="space-y-4">
             {qf.map((q, i) => (
@@ -189,6 +203,17 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
                     {(["situation", "task", "action", "result"] as const).map((k) => (
                       <Badge key={k} tone={q.star![k] ? "success" : "warning"}>{q.star![k] ? "✓" : "✗"} {k[0].toUpperCase() + k.slice(1)}</Badge>
                     ))}
+                  </div>
+                )}
+                {canPractice && (
+                  <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-ink-100 pt-3">
+                    <ButtonLink href={`/interviews/${iv.id}/practice/${q.questionId}`} variant="secondary" size="sm"><RotateCcw className="h-3.5 w-3.5" /> {bestRetry.has(q.questionId) ? "Practice again" : "Practice this question again"}</ButtonLink>
+                    {bestRetry.get(q.questionId) != null && (
+                      <span className="flex items-center gap-1.5 text-xs text-ink-500">
+                        Best retry <ScorePill score={bestRetry.get(q.questionId)} />
+                        {bestRetry.get(q.questionId)! > q.score && <span className="font-medium text-emerald-700">+{bestRetry.get(q.questionId)! - q.score}</span>}
+                      </span>
+                    )}
                   </div>
                 )}
               </li>

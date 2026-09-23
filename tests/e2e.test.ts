@@ -184,6 +184,23 @@ describe("AI interviews: behavioral, technical and full", () => {
       const points = await db.pointsEntry.findMany({ where: { interviewId: id } });
       expect(points.some((p) => p.amount === 100)).toBe(true);
       expect(await db.userBadge.count({ where: { user: { email: `ai-${type}@test.dev` }, badge: { key: "first_interview" } } })).toBe(1);
+      if (type === "behavioral") {
+        // Practice a question again: graded on the same scale, compared with the original, owner only.
+        const ev = await db.aiEvaluation.findUniqueOrThrow({ where: { interviewId: id } });
+        const firstQ = JSON.parse(ev.questionFeedback)[0];
+        const retry = await c.post(`/api/interviews/${id}/questions/${firstQ.questionId}/retry`, { text: GOOD_ANSWER, source: "typed" });
+        expect(retry.status, JSON.stringify(retry.data)).toBe(200);
+        expect(retry.data.originalScore).toBe(firstQ.score);
+        expect(typeof retry.data.score).toBe("number");
+        expect(retry.data.engine).toBe("fallback");
+        expect(await db.questionRetry.count({ where: { interviewId: id } })).toBe(1);
+        const stranger = await newStudent("ai-retry-other");
+        expect((await stranger.post(`/api/interviews/${id}/questions/${firstQ.questionId}/retry`, { text: GOOD_ANSWER })).status).toBe(404);
+        expect((await c.post(`/api/interviews/${id}/questions/not-a-question/retry`, { text: GOOD_ANSWER })).status).toBe(404);
+        expect((await c.post(`/api/interviews/${id}/questions/${firstQ.questionId}/retry`, { text: "" })).status).toBe(400);
+        const page = await c.req("GET", `/interviews/${id}/practice/${firstQ.questionId}`);
+        expect(page.status).toBe(200);
+      }
       // Double-submit of an old question is rejected.
       expect((await c.post(`/api/interviews/${id}/ai/answer`, { questionId: plan[0].id, text: "again" })).status).toBe(409);
       void followUps;

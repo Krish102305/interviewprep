@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { analyzeAnswer, excerpt, quoteAppearsIn } from "@/lib/ai/analysis";
 import { generateFromBank, interviewStructure, jobSkills, resumeHighlights } from "@/lib/ai/questions";
-import { gradeWithRubric, type QAPair } from "@/lib/ai/grading";
+import { gradeRetryWithRubric, gradeWithRubric, type QAPair } from "@/lib/ai/grading";
 import { ruleBasedFollowUp, transition } from "@/lib/ai/followups";
 import { BACKCHANNELS, voiceIdFor } from "@/lib/voice/tts";
 import { pickRandom } from "@/lib/services/matching";
@@ -155,5 +155,22 @@ describe("house style", () => {
   it("strips em dashes from AI output, deeply", async () => {
     const { withoutEmDashes } = await import("@/lib/ai/client");
     expect(withoutEmDashes({ a: "Got it — thanks.", b: ["x—y", "1–2 minutes"] })).toEqual({ a: "Got it, thanks.", b: ["x, y", "1–2 minutes"] });
+  });
+});
+
+describe("practice a question again", () => {
+  const qa: QAPair = { questionId: "q1", question: "Tell me about a time you led a team.", category: "behavioral", whatItTests: "Leadership", gradingCriteria: [], keywords: [], isFollowUp: false, answer: STRONG_STAR };
+  const base = { type: "behavioral" as const, targetRole: "Analyst", roleCategory: "finance", difficulty: "intermediate", originalFeedback: null };
+  it("scores a stronger retry higher and explains what improved", () => {
+    const weakScore = gradeWithRubric({ ...base, mode: "ai", qa: [{ ...qa, answer: WEAK }] }).questionFeedback[0].score;
+    const r = gradeRetryWithRubric({ ...base, qa, originalAnswer: WEAK, originalScore: weakScore });
+    expect(r.score).toBeGreaterThan(weakScore);
+    expect(r.improved.length).toBeGreaterThan(0);
+    expect(r.feedback).toMatch(/improvement/i);
+    expect(r.star).toEqual({ situation: true, task: true, action: true, result: true });
+  });
+  it("uses the same scale as the interview grader", () => {
+    const interviewScore = gradeWithRubric({ ...base, mode: "ai", qa: [qa] }).questionFeedback[0].score;
+    expect(gradeRetryWithRubric({ ...base, qa, originalAnswer: STRONG_STAR, originalScore: interviewScore }).score).toBe(interviewScore);
   });
 });
