@@ -23,6 +23,7 @@ const ENV = {
   STORAGE_DIR: path.join(ROOT, "storage-e2e"),
   ANTHROPIC_API_KEY: "", // exercise the labelled development engine deterministically
   ANTHROPIC_AUTH_TOKEN: "",
+  ELEVENLABS_API_KEY: "", // browser-voice fallback path
   APP_URL: BASE,
   NODE_ENV: "production",
   NEXT_TELEMETRY_DISABLED: "1",
@@ -158,6 +159,15 @@ describe("AI interviews: behavioral, technical and full", () => {
       expect(state.activeQuestion.whatItTests).toBeUndefined();
       const plan = await db.interviewQuestion.findMany({ where: { interviewId: id, isFollowUp: false }, orderBy: { order: "asc" } });
       expect(JSON.stringify(state)).not.toContain(plan[1].text); // future questions hidden
+      if (type === "behavioral") {
+        // Voice: falls back to the browser voice without a key, and only the candidate can use the endpoint.
+        expect(state.interviewer.naturalVoice).toBe(false);
+        const entry = state.transcript.find((t: { speaker: string }) => t.speaker === "interviewer");
+        expect((await c.get(`/api/interviews/${id}/tts?entries=${entry.id}`)).status).toBe(503);
+        const other = await newStudent("ai-tts-other");
+        expect((await other.get(`/api/interviews/${id}/tts?phrase=mhm`)).status).toBe(404);
+        expect((await new Client().get(`/api/interviews/${id}/tts?phrase=mhm`)).status).toBe(401);
+      }
       let followUps = 0;
       for (let i = 0; i < 30 && state.status === "active"; i++) {
         const r = await c.post(`/api/interviews/${id}/ai/answer`, { questionId: state.activeQuestion.id, text: i % 2 ? GOOD_ANSWER : "We did it together and it went fine.", source: "typed" });

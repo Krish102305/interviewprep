@@ -120,21 +120,123 @@ export type SpeakOptions = {
   onEnd?: () => void;
   /** Fires on each spoken word (where the browser supports it) — used for lip-sync. */
   onWord?: () => void;
+  /** Natural voice audio (server-generated MP3). Falls back to the browser voice if it fails. */
+  audioUrl?: string;
+  /** Receives the live loudness (0–1) of the natural voice for lip-sync; reset to null when done. */
+  mouthRef?: { current: number | null };
 };
 
+let audioCtx: AudioContext | null = null;
+/** Call from a user gesture (e.g. "Join interview") so the browser allows voice playback. */
+export function unlockAudio() {
+  if (typeof window === "undefined") return;
+  try {
+    const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    audioCtx ??= new AC();
+    if (audioCtx.state === "suspended") void audioCtx.resume();
+  } catch {
+    audioCtx = null;
+  }
+}
+
 /**
- * Text-to-speech for the AI interviewer's voice (browser speechSynthesis).
- * When muted or unsupported, onStart/onEnd still fire over an estimated
- * duration so the on-screen interviewer keeps "talking" with captions.
+ * The AI interviewer's voice. Plays the natural (ElevenLabs) voice when an
+ * audioUrl is given, otherwise — or if that fails — the browser's built-in
+ * speech synthesis. When muted or unsupported, onStart/onEnd still fire over an
+ * estimated duration so the on-screen interviewer keeps "talking" with captions.
+ * Returns a cancel function.
  */
-export function speak(text: string, enabled: boolean, opts: SpeakOptions = {}) {
+export function speak(text: string, enabled: boolean, opts: SpeakOptions = {}): () => void {
+  if (typeof window === "undefined") return () => {};
+  if (enabled && opts.audioUrl) return speakAudio(text, opts);
+  return speakBrowser(text, enabled, opts);
+}
+
+function speakAudio(text: string, opts: SpeakOptions): () => void {
+  const audio = new Audio();
+  audio.preload = "auto";
+  let cancelled = false;
+  let started = false;
+  let ended = false;
+  let raf = 0;
+  let fallbackCancel: (() => void) | null = null;
+  let source: MediaElementAudioSourceNode | null = null;
+
+  const cleanup = () => {
+    cancelAnimationFrame(raf);
+    if (opts.mouthRef) opts.mouthRef.current = null;
+    try {
+      source?.disconnect();
+    } catch {
+      /* already disconnected */
+    }
+  };
+  const finish = () => {
+    if (ended) return;
+    ended = true;
+    clearTimeout(safety);
+    cleanup();
+    opts.onEnd?.();
+  };
+  const fallback = () => {
+    if (cancelled || ended || started) return;
+    clearTimeout(safety);
+    cleanup();
+    ended = true; // the browser voice owns onEnd from here
+    fallbackCancel = speakBrowser(text, true, { ...opts, audioUrl: undefined });
+  };
+
+  // Route the audio through an analyser so the mouth follows the real voice.
+  if (audioCtx?.state === "running" && opts.mouthRef) {
+    try {
+      source = audioCtx.createMediaElementSource(audio);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+      const buf = new Uint8Array(analyser.fftSize);
+      const mouth = opts.mouthRef;
+      const tick = () => {
+        analyser.getByteTimeDomainData(buf);
+        let sum = 0;
+        for (const v of buf) sum += ((v - 128) / 128) ** 2;
+        mouth.current = Math.min(1, Math.sqrt(sum / buf.length) * 3.2);
+        raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    } catch {
+      source = null;
+    }
+  }
+
+  audio.onplaying = () => {
+    if (started) return;
+    started = true;
+    opts.onStart?.();
+  };
+  audio.onended = finish;
+  audio.onerror = () => (started ? finish() : fallback());
+  audio.src = opts.audioUrl!;
+  audio.play().catch(() => fallback());
+  // Network stalls: don't leave the interviewer frozen mid-sentence.
+  const safety = setTimeout(() => (started ? finish() : fallback()), Math.min(60000, 8000 + text.split(/\s+/).length * 700));
+
+  return () => {
+    cancelled = true;
+    audio.pause();
+    audio.removeAttribute("src");
+    fallbackCancel?.();
+    finish();
+  };
+}
+
+function speakBrowser(text: string, enabled: boolean, opts: SpeakOptions): () => void {
   const estimateMs = Math.min(25000, 500 + text.split(/\s+/).length * 340);
   const silent = () => {
     opts.onStart?.();
     const t = setTimeout(() => opts.onEnd?.(), estimateMs);
     return () => clearTimeout(t);
   };
-  if (typeof window === "undefined") return () => {};
   if (!enabled || !("speechSynthesis" in window)) return silent();
 
   window.speechSynthesis.cancel();

@@ -1,3 +1,4 @@
+import { isTtsConfigured } from "@/lib/voice/tts";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AlertTriangle, Ban, CalendarDays, CheckCircle2, Flag, GraduationCap, Scale, UserCheck, Users } from "lucide-react";
@@ -34,6 +35,7 @@ export default async function AdminHome() {
     { name: "AI (Claude)", ok: isAiConfigured(), env: "ANTHROPIC_API_KEY" },
     { name: "Google OAuth", ok: isGoogleConfigured(), env: "GOOGLE_CLIENT_ID / SECRET" },
     { name: "Email (Resend)", ok: isEmailConfigured(), env: "RESEND_API_KEY" },
+    { name: "Natural voice (ElevenLabs)", ok: isTtsConfigured(), env: "ELEVENLABS_API_KEY" },
     { name: "TURN relay", ok: Boolean(process.env.TURN_URL), env: "TURN_URL" },
   ];
   return (

@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { analyzeAnswer, excerpt, quoteAppearsIn } from "@/lib/ai/analysis";
 import { generateFromBank, interviewStructure, jobSkills, resumeHighlights } from "@/lib/ai/questions";
 import { gradeWithRubric, type QAPair } from "@/lib/ai/grading";
-import { ruleBasedFollowUp } from "@/lib/ai/followups";
+import { ruleBasedFollowUp, transition } from "@/lib/ai/followups";
+import { BACKCHANNELS, voiceIdFor } from "@/lib/voice/tts";
 import { pickRandom } from "@/lib/services/matching";
 import { levelFor } from "@/lib/services/gamification";
 import { standing } from "@/lib/services/conduct";
@@ -130,5 +131,22 @@ describe("validation (server-side security)", () => {
   it("rejects unsupported durations", () => {
     const r = createInterviewSchema.safeParse({ mode: "ai", type: "behavioral", targetRole: "PM", difficulty: "beginner", duration: 25, timing: "now" });
     expect(r.success).toBe(false);
+  });
+});
+
+describe("interviewer voice", () => {
+  it("gives each persona its own voice, overridable by env", () => {
+    const ids = ["ava", "marcus", "elena"].map(voiceIdFor);
+    expect(new Set(ids).size).toBe(3);
+    expect(voiceIdFor("unknown")).toBe(voiceIdFor("ava"));
+    process.env.ELEVENLABS_VOICE_MARCUS = "custom-voice";
+    expect(voiceIdFor("marcus")).toBe("custom-voice");
+    delete process.env.ELEVENLABS_VOICE_MARCUS;
+  });
+  it("only allows a fixed set of short reactions", () => {
+    expect(Object.values(BACKCHANNELS).every((p) => p.split(" ").length <= 2)).toBe(true);
+  });
+  it("transitions are empty or end with a space before the next question", () => {
+    for (let i = 0; i < 50; i++) expect(transition()).toMatch(/^$|\S $/);
   });
 });

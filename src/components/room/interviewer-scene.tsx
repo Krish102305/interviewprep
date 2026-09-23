@@ -14,6 +14,7 @@ export function InterviewerScene({
   pulse = 0,
   listening = false,
   thinking = false,
+  mouthLevel,
   className,
 }: {
   persona: Persona;
@@ -25,6 +26,8 @@ export function InterviewerScene({
   listening?: boolean;
   /** Interviewer is "considering" an answer — gaze drifts away. */
   thinking?: boolean;
+  /** Live voice amplitude (0–1) when real audio is playing; null → synthetic rhythm. */
+  mouthLevel?: React.RefObject<number | null>;
   className?: string;
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
@@ -44,7 +47,11 @@ export function InterviewerScene({
     let last = 0;
     let t = 0;
     const tick = (now: number) => {
-      if (now - last > 70) {
+      const live = mouthLevel?.current;
+      if (live != null) {
+        // Real voice audio: open the mouth with the loudness of the speech itself.
+        target.current = live < 0.04 ? 0.05 : Math.min(1, 0.15 + live * 1.1);
+      } else if (now - last > 70) {
         last = now;
         t += 1;
         // Syllable-like rhythm with some variety; word boundaries add emphasis.
@@ -56,7 +63,7 @@ export function InterviewerScene({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [speaking]);
+  }, [speaking, mouthLevel]);
   useEffect(() => {
     if (speaking && pulse) target.current = 0.95;
   }, [pulse, speaking]);

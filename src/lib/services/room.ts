@@ -4,8 +4,9 @@ import { parseJsonArray } from "@/lib/json";
 import { FOLLOW_UPS_PER_QUESTION, LABELS } from "@/lib/constants";
 import { shortName } from "@/lib/format";
 import type { SessionUser } from "@/lib/auth/session";
-import { decideNextTurn, replyToCandidateQuestions, suggestFollowUp } from "@/lib/ai/followups";
+import { decideNextTurn, replyToCandidateQuestions, suggestFollowUp, transition } from "@/lib/ai/followups";
 import { personaFor } from "@/lib/ai/personas";
+import { isTtsConfigured } from "@/lib/voice/tts";
 import { guideQuestion, loadForUser } from "./interviews";
 import { escalateIfRepeated, issueWarning, recordConductEvent } from "./conduct";
 import { track } from "./analytics";
@@ -98,7 +99,7 @@ export async function getRoomState(interviewId: string, user: SessionUser) {
     candidate: { id: iv.studentId, name: shortName(student?.profile), presence: presence(iv.studentId), school: isStaff ? student?.studentProfile?.school ?? null : undefined },
     interviewer:
       iv.mode === "ai"
-        ? { id: null, name: personaFor(iv.roleCategory).firstName, title: `AI Interviewer · ${personaFor(iv.roleCategory).title}`, persona: personaFor(iv.roleCategory).key, presence: { ready: true, online: true, connectionState: "connected" } }
+        ? { id: null, name: personaFor(iv.roleCategory).firstName, title: `AI Interviewer · ${personaFor(iv.roleCategory).title}`, persona: personaFor(iv.roleCategory).key, naturalVoice: isTtsConfigured(), presence: { ready: true, online: true, connectionState: "connected" } }
         : iv.interviewerId
           ? { id: iv.interviewerId, name: shortName(interviewer?.profile), title: interviewer?.interviewerProfile?.title ?? LABELS.interviewerType[interviewer?.interviewerProfile?.interviewerType ?? "professional"], presence: presence(iv.interviewerId) }
           : null,
@@ -283,7 +284,7 @@ export async function aiAnswer(interviewId: string, user: SessionUser, input: { 
     await say(interviewId, "interviewer", "note", decision.acknowledgement);
     return finishAi(iv, user);
   }
-  await say(interviewId, "interviewer", "question", `${decision.acknowledgement} ${overtime && next.category === "candidate_questions" ? "We're almost out of time. " : ""}${next.text}`.trim(), next.id);
+  await say(interviewId, "interviewer", "question", `${decision.acknowledgement} ${overtime && next.category === "candidate_questions" ? "We're almost out of time. " : ["candidate_questions", "closing"].includes(next.category) ? "" : transition()}${next.text}`.trim(), next.id);
   await markAsked(interviewId, next.id, nextIndex);
 }
 

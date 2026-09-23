@@ -13,8 +13,21 @@ export type QuestionForFollowUp = {
 
 export type TurnContext = { targetRole: string; company?: string | null; type: string; difficulty: string };
 
-const ACKS = ["Thank you.", "Okay, thanks for walking me through that.", "Got it — thank you.", "Understood.", "Thanks, that's helpful context."];
+const ACKS = [
+  "Okay, thank you.",
+  "Got it, thanks.",
+  "Okay. Thanks for walking me through that.",
+  "Right, okay.",
+  "Mm-hm. Thanks for that.",
+  "Understood.",
+  "Okay, that's helpful context.",
+  "Thanks — appreciate the detail.",
+];
 const ack = () => ACKS[Math.floor(Math.random() * ACKS.length)];
+
+const TRANSITIONS = ["", "", "Let's move on. ", "Okay, next one. ", "Switching gears a little. ", "Let me ask you something different. ", "Next question. "];
+/** A spoken bridge into the next planned question — varied so the interviewer doesn't sound scripted. */
+export const transition = () => TRANSITIONS[Math.floor(Math.random() * TRANSITIONS.length)];
 
 // ---------------------------------------------------------------------------
 // Development engine
@@ -65,7 +78,9 @@ const TURN_SYSTEM = `You are a professional, realistic job interviewer on Interv
 
 Ask a follow-up only when it adds real interview value: the answer was vague, missing a result, missing personal actions, skipped the reasoning, or contained something worth probing. Otherwise move on. Keep the follow-up to one natural spoken sentence, grounded in what the candidate actually said.
 
-The acknowledgement is a brief, neutral interviewer phrase ("Thanks.", "Got it.") — real interviewers do not praise or critique answers mid-interview, and never reveal scores.`;
+Everything you write is spoken aloud by a voice in a live video interview, so write the way people talk: contractions, short sentences, no lists, no markdown, no emoji.
+
+The acknowledgement is a brief, natural, neutral spoken reaction — vary it ("Okay, got it.", "Mm-hm, thanks.", "Right, okay."). It may briefly reflect a concrete detail the candidate mentioned ("Okay — so the rollout slipped a week. Got it.") but never praises or critiques the answer, and never reveals scores. A follow-up should sound like a curious interviewer, e.g. "You mentioned the client pushed back — how did you handle that?"`;
 
 const TurnSchema = z.object({
   action: z.enum(["follow_up", "next"]),
