@@ -86,7 +86,20 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
 
   const aiInterviewer = state?.interviewer as { persona?: string; naturalVoice?: boolean } | null | undefined;
   const persona: Persona = (aiInterviewer?.persona && PERSONAS[aiInterviewer.persona]) || PERSONAS.ava;
-  const naturalVoice = Boolean(aiInterviewer?.naturalVoice);
+  // Natural (ElevenLabs) voice until it fails once; then the browser voice for the rest of the session.
+  const [voiceProblem, setVoiceProblem] = useState<string | null>(null);
+  const naturalVoice = Boolean(aiInterviewer?.naturalVoice) && !voiceProblem;
+  const onVoiceFallback = (url: string) => () => {
+    if (voiceProblem) return;
+    setVoiceProblem("The natural voice couldn't play.");
+    fetch(url)
+      .then(async (r) => {
+        const reason = r.ok ? "The natural voice couldn't play in this browser." : ((await r.json().catch(() => null))?.error ?? `Voice request failed (HTTP ${r.status}).`);
+        setVoiceProblem(reason);
+        toast.error(`${reason} Using the basic browser voice instead.`);
+      })
+      .catch(() => toast.error("The natural voice couldn't load. Using the basic browser voice instead."));
+  };
 
   // Speak each new interviewer line once, lip-synced to the browser's voice.
   useEffect(() => {
@@ -109,6 +122,7 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
         gender: persona.gender,
         audioUrl,
         mouthRef: mouthLevel,
+        onFallback: audioUrl ? onVoiceFallback(audioUrl) : undefined,
         onStart: () => {
           wordsSpoken.current = { boundary: 0, startedAt: Date.now() };
           setSpeaking(true);
@@ -429,6 +443,14 @@ export function AiRoom({ id, candidateName, candidateInitials }: { id: string; c
               {state.activeQuestion && (
                 <span className="rounded-lg bg-black/55 px-2.5 py-1 text-xs font-medium text-white backdrop-blur">
                   {state.activeQuestion.isFollowUp ? "Follow-up" : `Question ${state.progress.current} of ${state.progress.total}`}
+                </span>
+              )}
+              {voiceOn && (
+                <span
+                  className={cn("rounded-lg bg-black/55 px-2 py-1 text-[11px] font-medium backdrop-blur", naturalVoice ? "text-emerald-300" : "text-amber-300")}
+                  title={naturalVoice ? "Natural voice (ElevenLabs)" : voiceProblem ?? "Basic browser voice — add ELEVENLABS_API_KEY for a natural voice"}
+                >
+                  {naturalVoice ? "HD voice" : "Basic voice"}
                 </span>
               )}
               <span className="rounded-lg bg-black/55 p-1.5 text-emerald-300 backdrop-blur" title="Connection good"><SignalHigh className="h-3.5 w-3.5" aria-hidden /></span>

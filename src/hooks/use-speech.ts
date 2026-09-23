@@ -124,6 +124,8 @@ export type SpeakOptions = {
   audioUrl?: string;
   /** Receives the live loudness (0–1) of the natural voice for lip-sync; reset to null when done. */
   mouthRef?: { current: number | null };
+  /** The natural voice couldn't play and the browser voice took over. */
+  onFallback?: () => void;
 };
 
 let audioCtx: AudioContext | null = null;
@@ -183,6 +185,7 @@ function speakAudio(text: string, opts: SpeakOptions): () => void {
     clearTimeout(safety);
     cleanup();
     ended = true; // the browser voice owns onEnd from here
+    opts.onFallback?.();
     fallbackCancel = speakBrowser(text, true, { ...opts, audioUrl: undefined });
   };
 

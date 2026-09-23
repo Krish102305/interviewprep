@@ -14,7 +14,8 @@ const DEFAULT_VOICES: Record<string, string> = {
   elena: "XrExE9yKIg1WjnnlVkGX", // Matilda — clear, professional American
 };
 
-export const TTS_MODEL = process.env.ELEVENLABS_MODEL || "eleven_flash_v2_5";
+/** eleven_multilingual_v2 is ElevenLabs' most lifelike stable model; eleven_flash_v2_5 is faster and cheaper but flatter. */
+export const TTS_MODEL = process.env.ELEVENLABS_MODEL || "eleven_multilingual_v2";
 
 export function isTtsConfigured() {
   return Boolean(process.env.ELEVENLABS_API_KEY);
@@ -51,14 +52,39 @@ export async function synthesize(text: string, personaKey: string, signal?: Abor
     body: JSON.stringify({
       text,
       model_id: TTS_MODEL,
-      voice_settings: { stability: 0.45, similarity_boost: 0.8, style: 0.15, use_speaker_boost: true },
+      // Lower stability = more natural variation in pitch and pacing, like a real person.
+      voice_settings: { stability: 0.38, similarity_boost: 0.8, style: 0.25, use_speaker_boost: true },
     }),
     signal,
+  }).catch((err) => {
+    if (signal?.aborted) throw err;
+    console.error("[tts] couldn't reach ElevenLabs", err);
+    throw new TtsError("Couldn't reach ElevenLabs from the server — check your internet connection.", 502);
   });
   if (!res.ok || !res.body) {
     const detail = await res.text().catch(() => "");
-    console.error("[tts] ElevenLabs request failed", res.status, detail.slice(0, 300));
-    throw new TtsError(res.status === 401 ? "The ElevenLabs API key was rejected." : "Voice generation failed.", 502);
+    console.error("[tts] ElevenLabs request failed", res.status, detail.slice(0, 500));
+    throw new TtsError(explainFailure(res.status, detail), 502);
   }
   return res.body;
+}
+
+/** Turn an ElevenLabs error into something the candidate / developer can act on (never includes the key). */
+function explainFailure(status: number, body: string) {
+  let code = "";
+  let message = "";
+  try {
+    const d = JSON.parse(body)?.detail;
+    code = String(d?.status ?? d?.code ?? "");
+    message = String(d?.message ?? (typeof d === "string" ? d : ""));
+  } catch {
+    /* not JSON */
+  }
+  if (code.includes("quota") || /quota|credits/i.test(message)) return "ElevenLabs credits are used up (or the key's credit limit was reached).";
+  if (code.includes("permission") || /permission/i.test(message)) return "The ElevenLabs key doesn't have Text to Speech access — edit the key and allow it.";
+  if (code.includes("unusual_activity") || /unusual activity/i.test(message)) return "ElevenLabs blocked free-tier API use from this network — a paid plan fixes this.";
+  if (code.includes("voice_not_found") || /voice/i.test(code)) return "That ElevenLabs voice isn't available on your account — check the ELEVENLABS_VOICE_* settings.";
+  if (status === 401) return "The ElevenLabs API key was rejected — check ELEVENLABS_API_KEY in .env.";
+  if (status === 429) return "ElevenLabs is rate-limiting requests right now.";
+  return `ElevenLabs voice generation failed (HTTP ${status}${message ? `: ${message.slice(0, 120)}` : ""}).`;
 }

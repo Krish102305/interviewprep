@@ -98,7 +98,7 @@ tests/                    unit + end-to-end tests
 | `ANTHROPIC_API_KEY` | recommended | Enables Claude for questions, follow-ups, candidate Q&A and grading |
 | `AI_MODEL` | no | Overrides the default model (`claude-opus-5`) |
 | `ELEVENLABS_API_KEY` | no | Human-sounding voices for the AI interviewers (server-side only) |
-| `ELEVENLABS_VOICE_AVA` / `_MARCUS` / `_ELENA`, `ELEVENLABS_MODEL` | no | Override the per-interviewer voice IDs and the TTS model (default `eleven_flash_v2_5`) |
+| `ELEVENLABS_VOICE_AVA` / `_MARCUS` / `_ELENA`, `ELEVENLABS_MODEL` | no | Override the per-interviewer voice IDs and the TTS model (default `eleven_multilingual_v2`, the most lifelike; `eleven_flash_v2_5` is faster and cheaper) |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | no | Google sign-in. Redirect URI: `${APP_URL}/api/auth/google/callback` |
 | `TURN_URL`, `TURN_USERNAME`, `TURN_CREDENTIAL` | no | TURN relay for video behind strict NATs. Served only to signed-in users |
 | `RESEND_API_KEY`, `EMAIL_FROM` | no | Email copies of important notifications |
