@@ -3,14 +3,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
-  Award, BarChart3, Bell, Calendar, Flag, History, LayoutDashboard, Menu, Plus, Scale, Shield, ShieldAlert, Star, Trophy, User, UserCheck, Users, Video, X,
+  Award, BarChart3, Bell, Briefcase, Calendar, Flag, History, LayoutDashboard, Menu, Plus, Scale, Shield, ShieldAlert, Star, Trophy, User, UserCheck, Users, Video, X,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { Logo } from "./logo";
 
 const ICONS = {
   dashboard: LayoutDashboard, users: Users, userCheck: UserCheck, video: Video, flag: Flag, shieldAlert: ShieldAlert, scale: Scale, star: Star,
-  chart: BarChart3, calendar: Calendar, trophy: Trophy, user: User, shield: Shield, plus: Plus, history: History, bell: Bell, award: Award,
+  chart: BarChart3, calendar: Calendar, trophy: Trophy, user: User, shield: Shield, plus: Plus, briefcase: Briefcase, history: History, bell: Bell, award: Award,
 };
 export type NavItem = { href: string; label: string; icon: keyof typeof ICONS };
 

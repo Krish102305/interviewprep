@@ -37,6 +37,7 @@ function navFor(user: SessionUser): NavItem[] {
   return [
     { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
     { href: "/interviews/new", label: "Start Interview", icon: "plus" },
+    { href: "/jobs", label: "Internships", icon: "briefcase" },
     { href: "/interviews", label: "Interview History", icon: "history" },
     { href: "/performance", label: "Performance", icon: "chart" },
     { href: "/leaderboard", label: "Leaderboard", icon: "trophy" },

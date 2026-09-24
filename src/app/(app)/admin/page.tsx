@@ -1,3 +1,5 @@
+import { syncState } from "@/lib/jobs/sync";
+import { relativeTime } from "@/lib/format";
 import { isTtsConfigured } from "@/lib/voice/tts";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -31,6 +33,7 @@ export default async function AdminHome() {
     db.appeal.count({ where: { status: "pending" } }),
     db.adminAction.findMany({ orderBy: { createdAt: "desc" }, take: 10, include: { admin: { select: { profile: true } }, targetUser: { select: { email: true } } } }),
   ]);
+  const jobs = await syncState();
   const integrations = [
     { name: "Database (PostgreSQL)", ok: /^postgres(ql)?:\/\//.test(process.env.DATABASE_URL ?? ""), env: "DATABASE_URL" },
     { name: "AI (Claude)", ok: isAiConfigured(), env: "ANTHROPIC_API_KEY" },
@@ -38,6 +41,7 @@ export default async function AdminHome() {
     { name: "Email (Resend)", ok: isEmailConfigured(), env: "RESEND_API_KEY" },
     { name: "Natural voice (ElevenLabs)", ok: isTtsConfigured(), env: "ELEVENLABS_API_KEY" },
     { name: "TURN relay", ok: Boolean(process.env.TURN_URL), env: "TURN_URL" },
+    { name: "Internship listings", ok: jobs.count > 0, env: `${jobs.count.toLocaleString()} open${jobs.succeededAt ? ` · updated ${relativeTime(jobs.succeededAt)}` : ""}${jobs.lastError ? ` · last sync failed: ${jobs.lastError}` : ""}` },
   ];
   return (
     <div className="space-y-8">

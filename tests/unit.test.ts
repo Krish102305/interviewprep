@@ -174,3 +174,55 @@ describe("practice a question again", () => {
     expect(gradeRetryWithRubric({ ...base, qa, originalAnswer: STRONG_STAR, originalScore: interviewScore }).score).toBe(interviewScore);
   });
 });
+
+describe("internship listings", async () => {
+  const { isInternship, htmlToText, extractTerm, categorize, normalizeGreenhouse, normalizeLever, normalizeAshby, normalizeCommunity, descriptionLookup } = await import("@/lib/jobs/sources");
+  const board = (source: "greenhouse" | "lever" | "ashby") => ({ source, slug: "acme", company: "Acme" });
+
+  it("recognizes internships but not 'internal' roles", () => {
+    expect(isInternship("Software Engineer Intern")).toBe(true);
+    expect(isInternship("2027 Summer Analyst, Investment Banking")).toBe(true);
+    expect(isInternship("Co-op, Data Engineering")).toBe(true);
+    expect(isInternship("Internal Audit Lead")).toBe(false);
+    expect(isInternship("Research Scientist", "Intern")).toBe(true);
+  });
+  it("turns escaped HTML into clean text without em dashes", () => {
+    const t = htmlToText("&lt;p&gt;About us&lt;/p&gt;&lt;ul&gt;&lt;li&gt;Build things &amp;amp; ship&lt;/li&gt;&lt;li&gt;Learn — fast&lt;/li&gt;&lt;/ul&gt;");
+    expect(t).toBe("About us\n\n• Build things & ship\n• Learn, fast");
+  });
+  it("extracts terms and role categories", () => {
+    expect(extractTerm("2027 Summer Intern")).toBe("Summer 2027");
+    expect(extractTerm("Intern (Fall '26)")).toBe("Fall 2026");
+    expect(extractTerm("Intern", ["Summer 2027"])).toBe("Summer 2027");
+    expect(categorize("Software Engineer Intern")).toBe("software_engineering");
+    expect(categorize("Hardware Engineering Intern")).toBe("general");
+    expect(categorize("Intern, Growth", "Product")).toBe("marketing");
+    expect(categorize("Research Intern", "AI/ML/Data")).toBe("data_science");
+  });
+  it("normalizes each source and keeps only internships with https links", () => {
+    const gh = normalizeGreenhouse(board("greenhouse"), { jobs: [
+      { id: 1, title: "Software Engineer Intern, Summer 2027", absolute_url: "https://boards.greenhouse.io/acme/jobs/1", location: { name: "NYC" }, first_published: "2026-09-01T00:00:00Z" },
+      { id: 2, title: "Staff Engineer", absolute_url: "https://boards.greenhouse.io/acme/jobs/2" },
+      { id: 3, title: "Data Intern", absolute_url: "javascript:alert(1)" },
+    ] });
+    expect(gh).toHaveLength(1);
+    expect(gh[0]).toMatchObject({ externalId: "acme:1", company: "Acme", term: "Summer 2027", location: "NYC", roleCategory: "software_engineering" });
+    const lv = normalizeLever(board("lever"), [{ id: "x", text: "Product Intern", hostedUrl: "https://jobs.lever.co/acme/x", categories: { location: "Remote" }, descriptionPlain: "Do product things", createdAt: 1790000000000 }]);
+    expect(lv[0]).toMatchObject({ roleCategory: "product_management", description: "Do product things" });
+    const ab = normalizeAshby(board("ashby"), { jobs: [{ id: "y", title: "ML Research", employmentType: "Intern", jobUrl: "https://jobs.ashbyhq.com/acme/y", isListed: true }, { id: "z", title: "Intern", jobUrl: "https://jobs.ashbyhq.com/acme/z", isListed: false }] });
+    expect(ab.map((a) => a.externalId)).toEqual(["acme:y"]);
+    const cm = normalizeCommunity([
+      { id: "a", active: true, is_visible: true, title: "SWE Intern", company_name: "Beta", url: "https://beta.com/a", locations: ["A", "B", "C", "D"], terms: ["Summer 2027"], category: "Software", date_posted: 1790000000 },
+      { id: "b", active: false, title: "Old Intern", company_name: "Beta", url: "https://beta.com/b" },
+    ]);
+    expect(cm).toHaveLength(1);
+    expect(cm[0].location).toBe("A; B; C +1 more");
+  });
+  it("only ever fetches descriptions from known job-board hosts", () => {
+    expect(descriptionLookup({ source: "simplify", externalId: "1", url: "https://acme.wd5.myworkdayjobs.com/en-US/Careers/job/NYC/Intern_R1" })?.api).toBe("https://acme.wd5.myworkdayjobs.com/wday/cxs/acme/Careers/job/NYC/Intern_R1");
+    expect(descriptionLookup({ source: "simplify", externalId: "1", url: "https://job-boards.greenhouse.io/acme/jobs/123" })?.api).toBe("https://boards-api.greenhouse.io/v1/boards/acme/jobs/123");
+    expect(descriptionLookup({ source: "greenhouse", externalId: "acme:9", url: "https://acme.com/careers?gh_jid=9" })?.api).toBe("https://boards-api.greenhouse.io/v1/boards/acme/jobs/9");
+    expect(descriptionLookup({ source: "simplify", externalId: "1", url: "https://evil.example/jobs.lever.co/acme/00000000-0000-0000-0000-000000000000" })).toBeNull();
+    expect(descriptionLookup({ source: "simplify", externalId: "1", url: "http://169.254.169.254/latest/meta-data" })).toBeNull();
+  });
+});

@@ -754,3 +754,54 @@ model QuestionRetry {
   @@index([interviewId, questionId])
   @@map("question_retries")
 }
+
+/// A real, currently-open internship, pulled from public job boards
+/// (Greenhouse, Lever, Ashby) and a community-maintained internship list.
+model JobListing {
+  id                String    @id @default(cuid())
+  /// greenhouse | lever | ashby | simplify
+  source            String
+  /// Stable id within the source (e.g. "stripe:12345")
+  externalId        String
+  company           String
+  title             String
+  location          String    @default("")
+  url               String
+  /// e.g. "Summer 2027" (empty when unknown)
+  term              String    @default("")
+  /// One of ROLE_CATEGORIES
+  roleCategory      String    @default("general")
+  /// Lowercased company + title + location, for portable case-insensitive search
+  searchText        String
+  /// Plain-text description. Fetched on demand for sources whose feed has none.
+  description       String?
+  /// pending | ok | unavailable
+  descriptionStatus String    @default("pending")
+  descriptionAt     DateTime?
+  postedAt          DateTime?
+  active            Boolean   @default(true)
+  lastSeenAt        DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@unique([source, externalId])
+  @@index([active, postedAt])
+  @@index([active, roleCategory])
+  @@map("job_listings")
+}
+
+/// Bookkeeping for the job-listing sync (one row per job, id "internships").
+model JobSync {
+  id          String    @id
+  status      String    @default("idle")
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  /// Last successful finish
+  succeededAt DateTime?
+  added       Int       @default(0)
+  updated     Int       @default(0)
+  removed     Int       @default(0)
+  error       String?
+
+  @@map("job_syncs")
+}

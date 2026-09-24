@@ -27,15 +27,17 @@ export function NewInterviewWizard(props: {
   companies: string[];
   resumes: ResumeSummary[];
   aiConfigured: boolean;
+  /** Prefill from an internship listing ("Practice for this job"). */
+  job?: { id: string; company: string; role: string; title: string; description: string; url: string } | null;
 }) {
   const router = useRouter();
   const toast = useToast();
   const [step, setStep] = useState(props.initialMode ? (props.initialType ? 2 : 1) : 0);
   const [mode, setMode] = useState<Mode | null>(props.initialMode);
   const [type, setType] = useState<Type | null>(props.initialType);
-  const [targetRole, setTargetRole] = useState(props.targetRoles[0] ?? "");
-  const [company, setCompany] = useState("");
-  const [jd, setJd] = useState("");
+  const [targetRole, setTargetRole] = useState(props.job?.role ?? props.targetRoles[0] ?? "");
+  const [company, setCompany] = useState(props.job?.company ?? "");
+  const [jd, setJd] = useState(props.job?.description ?? "");
   const [jdBusy, setJdBusy] = useState(false);
   const [resumes, setResumes] = useState(props.resumes);
   const [resumeId, setResumeId] = useState<string | null>(props.resumes.find((r) => r.isDefault)?.id ?? props.resumes[0]?.id ?? null);
@@ -122,6 +124,17 @@ export function NewInterviewWizard(props: {
 
   return (
     <div>
+      {props.job && (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-olive-200 bg-olive-50/70 px-4 py-3 text-sm">
+          <p className="text-ink-700">
+            Practicing for <strong className="text-ink-950">{props.job.title}</strong> at <strong className="text-ink-950">{props.job.company}</strong>.{" "}
+            {props.job.description ? "The role, company and job description are filled in for you." : (
+              <>We couldn&apos;t load its description, so paste it from the <a href={props.job.url} target="_blank" rel="noopener noreferrer" className="font-medium underline">posting</a> in the Details step for the best questions.</>
+            )}
+          </p>
+          <a href={`/jobs/${props.job.id}`} className="text-xs font-medium text-olive-800 underline-offset-2 hover:underline">View listing</a>
+        </div>
+      )}
       <Stepper steps={STEPS} current={step} />
       <Card className="mt-8 p-6 sm:p-8">
         {step === 0 && (

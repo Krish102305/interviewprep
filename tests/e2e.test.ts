@@ -24,6 +24,7 @@ const ENV = {
   ANTHROPIC_API_KEY: "", // exercise the labelled development engine deterministically
   ANTHROPIC_AUTH_TOKEN: "",
   ELEVENLABS_API_KEY: "", // browser-voice fallback path
+  JOBS_SYNC: "off", // no network in tests; listings are inserted directly
   APP_URL: BASE,
   NODE_ENV: "production",
   NEXT_TELEMETRY_DISABLED: "1",
@@ -56,6 +57,10 @@ class Client {
     return { status: res.status, data };
   }
   get = <T = any>(u: string) => this.req<T>("GET", u);
+  page = async (u: string) => {
+    const res = await fetch(BASE + u, { headers: this.cookie ? { cookie: this.cookie } : {}, redirect: "manual" });
+    return { status: res.status, html: await res.text() };
+  };
   post = <T = any>(u: string, b: unknown = {}) => this.req<T>("POST", u, b);
   async login(email: string, password = "demo1234") {
     const r = await this.post("/api/auth/login", { email, password });
@@ -219,6 +224,31 @@ describe("AI interviews: behavioral, technical and full", () => {
       void followUps;
     });
   }
+});
+
+describe("internship listings", () => {
+  it("browses real listings and pre-fills the interview setup from one", async () => {
+    const job = await db.jobListing.create({
+      data: {
+        source: "greenhouse", externalId: "acme:1", company: "Acme Robotics", title: "Software Engineer Intern - Summer 2027", location: "New York, NY",
+        url: "https://boards.greenhouse.io/acme/jobs/1", term: "Summer 2027", roleCategory: "software_engineering",
+        searchText: "acme robotics software engineer intern - summer 2027 new york, ny", description: "Build robot fleet tooling in TypeScript and Go.", descriptionStatus: "ok", postedAt: new Date(),
+      },
+    });
+    await db.jobListing.create({ data: { source: "simplify", externalId: "zz", company: "Closed Co", title: "Old Intern", url: "https://closed.example/1", searchText: "closed co old intern", active: false } });
+    const c = await newStudent("jobs-browser");
+    const list = await c.page("/jobs?category=all&q=robotics");
+    expect(list.status).toBe(200);
+    expect(list.html).toContain("Software Engineer Intern - Summer 2027");
+    expect(list.html).not.toContain("Old Intern");
+    const detail = await c.page(`/jobs/${job.id}`);
+    expect(detail.html).toContain("Build robot fleet tooling");
+    const setup = await c.page(`/interviews/new?job=${job.id}`);
+    expect(setup.html).toContain("Practicing for");
+    expect(setup.html).toContain("Acme Robotics");
+    expect(setup.html).toContain("Build robot fleet tooling"); // description prefilled
+    expect((await new Client().page("/jobs")).status).toBe(307); // signed-out visitors are sent to sign in
+  });
 });
 
 describe("human interview end-to-end", () => {
