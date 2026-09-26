@@ -218,11 +218,22 @@ describe("internship listings", async () => {
     expect(cm).toHaveLength(1);
     expect(cm[0].location).toBe("A; B; C +1 more");
   });
-  it("only ever fetches descriptions from known job-board hosts", () => {
-    expect(descriptionLookup({ source: "simplify", externalId: "1", url: "https://acme.wd5.myworkdayjobs.com/en-US/Careers/job/NYC/Intern_R1" })?.api).toBe("https://acme.wd5.myworkdayjobs.com/wday/cxs/acme/Careers/job/NYC/Intern_R1");
-    expect(descriptionLookup({ source: "simplify", externalId: "1", url: "https://job-boards.greenhouse.io/acme/jobs/123" })?.api).toBe("https://boards-api.greenhouse.io/v1/boards/acme/jobs/123");
-    expect(descriptionLookup({ source: "greenhouse", externalId: "acme:9", url: "https://acme.com/careers?gh_jid=9" })?.api).toBe("https://boards-api.greenhouse.io/v1/boards/acme/jobs/9");
-    expect(descriptionLookup({ source: "simplify", externalId: "1", url: "https://evil.example/jobs.lever.co/acme/00000000-0000-0000-0000-000000000000" })).toBeNull();
-    expect(descriptionLookup({ source: "simplify", externalId: "1", url: "http://169.254.169.254/latest/meta-data" })).toBeNull();
+  it("maps postings to the right reader and never to private addresses", async () => {
+    const { isPrivateIp, isPublicHost, jobPostingFromHtml } = await import("@/lib/jobs/sources");
+    const look = (url: string, source = "simplify", externalId = "1") => descriptionLookup({ source, externalId, url });
+    expect(look("https://acme.wd5.myworkdayjobs.com/en-US/Careers/job/NYC/Intern_R1")).toMatchObject({ kind: "workday", api: "https://acme.wd5.myworkdayjobs.com/wday/cxs/acme/Careers/job/NYC/Intern_R1" });
+    expect(look("https://job-boards.greenhouse.io/acme/jobs/123")).toMatchObject({ kind: "greenhouse", api: "https://boards-api.greenhouse.io/v1/boards/acme/jobs/123" });
+    expect(look("https://acme.com/careers?gh_jid=9", "greenhouse", "acme:9")).toMatchObject({ api: "https://boards-api.greenhouse.io/v1/boards/acme/jobs/9" });
+    expect(look("https://jobs.smartrecruiters.com/Acme/7440000-intern")).toMatchObject({ kind: "smartrecruiters", api: "https://api.smartrecruiters.com/v1/companies/Acme/postings/7440000" });
+    expect(look("https://abcd.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/job/12345")).toMatchObject({ kind: "oracle" });
+    expect(look("https://careers.example.com/jobs/1")).toMatchObject({ kind: "page" });
+    expect(look("http://169.254.169.254/latest/meta-data")).toBeNull(); // not https, raw IP
+    expect(look("https://10.0.0.5/jobs")).toBeNull(); // raw IP
+    expect(["10.1.2.3", "127.0.0.1", "169.254.169.254", "172.20.0.1", "192.168.1.1", "100.64.0.1", "::1", "fd00::1", "::ffff:10.0.0.1"].every(isPrivateIp)).toBe(true);
+    expect(["8.8.8.8", "151.101.1.1", "2606:4700::1111"].some(isPrivateIp)).toBe(false);
+    expect(await isPublicHost("localhost")).toBe(false);
+    expect(await isPublicHost("db.railway.internal")).toBe(false);
+    expect(jobPostingFromHtml('<script type="application/ld+json">{"@type":"JobPosting","title":"Intern","description":"<p>Build things</p>"}</script>')).toBe("<p>Build things</p>");
+    expect(jobPostingFromHtml("<html>no data</html>")).toBeNull();
   });
 });

@@ -185,10 +185,56 @@ export function normalizeCommunity(json: Json[]): RawListing[] {
   });
 }
 
+/**
+ * Fetch a public web page (a job posting link from the listings feed).
+ * Refuses anything that resolves to a private or local address, follows at
+ * most 3 redirects with the same check, and caps size and time.
+ */
+export async function fetchPublicPage(url: string, timeoutMs = 10000): Promise<string | null> {
+  let current = url;
+  for (let hop = 0; hop < 4; hop++) {
+    const u = new URL(current);
+    if (u.protocol !== "https:" || !(await isPublicHost(u.hostname))) return null;
+    const res = await fetch(u, { headers: { "User-Agent": "Mozilla/5.0 (compatible; InterviewConnect/1.0; +internship listings)", Accept: "text/html" }, redirect: "manual", signal: AbortSignal.timeout(timeoutMs), cache: "no-store" });
+    if (res.status >= 300 && res.status < 400 && res.headers.get("location")) {
+      current = new URL(res.headers.get("location")!, u).toString();
+      continue;
+    }
+    if (!res.ok || !(res.headers.get("content-type") ?? "").includes("html")) return null;
+    const len = Number(res.headers.get("content-length") ?? 0);
+    if (len > 3_000_000) return null;
+    return (await res.text()).slice(0, 3_000_000);
+  }
+  return null;
+}
+
+/** True only for hostnames that resolve exclusively to public internet addresses. */
+export async function isPublicHost(hostname: string) {
+  const h = hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  if (!/^[a-z0-9.-]+\.[a-z]{2,}$/.test(h) || /(^|\.)(localhost|local|internal|intranet|corp|home|lan)$/.test(h)) return false;
+  try {
+    const { lookup } = await import("node:dns/promises");
+    const addrs = await lookup(h, { all: true });
+    return addrs.length > 0 && addrs.every((a) => !isPrivateIp(a.address));
+  } catch {
+    return false;
+  }
+}
+
+export function isPrivateIp(ip: string) {
+  if (ip.includes(":")) {
+    const v = ip.toLowerCase();
+    if (v.startsWith("::ffff:")) return isPrivateIp(v.slice(7));
+    return v === "::1" || v === "::" || v.startsWith("fc") || v.startsWith("fd") || v.startsWith("fe8") || v.startsWith("fe9") || v.startsWith("fea") || v.startsWith("feb");
+  }
+  const [a, b] = ip.split(".").map(Number);
+  return a === 10 || a === 127 || a === 0 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 100 && b >= 64 && b <= 127) || a >= 224;
+}
+
 export async function fetchJson<T = unknown>(url: string, timeoutMs = 20000): Promise<T> {
   const res = await fetch(url, { headers: { "User-Agent": "InterviewConnect/1.0 (internship listings)", Accept: "application/json" }, signal: AbortSignal.timeout(timeoutMs), cache: "no-store" });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${new URL(url).host}`);
-  return (await res.json()) as T;
+  if (!res.ok) throw Object.assign(new Error(`HTTP ${res.status} for ${new URL(url).host}`), { status: res.status });
+  return (await res.json()) as T; // an outage page (HTML) throws here, which callers treat as temporary
 }
 
 export function boardUrl(b: Board) {
@@ -205,6 +251,9 @@ export function descriptionLookup(l: { source: string; externalId: string; url: 
   | { kind: "greenhouse" | "lever"; api: string }
   | { kind: "ashby"; api: string; id: string }
   | { kind: "workday"; api: string }
+  | { kind: "smartrecruiters"; api: string }
+  | { kind: "oracle"; api: string }
+  | { kind: "page"; url: string }
   | null {
   if (l.source === "greenhouse") {
     const [board, id] = l.externalId.split(":");
@@ -219,6 +268,29 @@ export function descriptionLookup(l: { source: string; externalId: string; url: 
   if (m) return { kind: "ashby", api: `https://api.ashbyhq.com/posting-api/job-board/${m[1]}`, id: m[2] };
   m = u.match(/^https:\/\/([a-z0-9-]+)\.(wd\d+)\.myworkdayjobs\.com\/(?:[a-z]{2}-[A-Z]{2}\/)?([^/?#]+)\/job\/([^?#]+)/);
   if (m) return { kind: "workday", api: `https://${m[1]}.${m[2]}.myworkdayjobs.com/wday/cxs/${m[1]}/${m[3]}/job/${m[4]}` };
+  m = u.match(/^https:\/\/(?:jobs|careers)\.smartrecruiters\.com\/([A-Za-z0-9_-]+)\/(\d+)/);
+  if (m) return { kind: "smartrecruiters", api: `https://api.smartrecruiters.com/v1/companies/${m[1]}/postings/${m[2]}` };
+  m = u.match(/^https:\/\/([a-z0-9-]+(?:\.[a-z0-9-]+)*\.oraclecloud\.com)\/hcmUI\/CandidateExperience\/[a-z]{2}(?:-[A-Z]{2})?\/sites\/([A-Za-z0-9_]+)\/(?:job|requisitions\/preview)\/(\d+)/);
+  if (m) return { kind: "oracle", api: `https://${m[1]}/hcmRestApi/resources/latest/recruitingCEJobRequisitionDetails?expand=all&onlyData=true&finder=ById;Id=%22${m[3]}%22,siteNumber=${m[2]}` };
+  // Anything else: read the posting page itself for standard JobPosting data (schema.org).
+  if (/^https:\/\/[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(u)) return { kind: "page", url: u };
+  return null;
+}
+
+/** Pull a schema.org JobPosting description out of a careers page, if it has one. */
+export function jobPostingFromHtml(html: string): string | null {
+  for (const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
+    let data: unknown;
+    try {
+      data = JSON.parse(m[1].trim());
+    } catch {
+      continue;
+    }
+    const items = Array.isArray(data) ? data : ((data as Json)?.["@graph"] as unknown[]) ?? [data];
+    for (const it of items as Json[]) {
+      if (it && String(it["@type"]).includes("JobPosting") && typeof it.description === "string") return it.description;
+    }
+  }
   return null;
 }
 
@@ -226,12 +298,22 @@ export function descriptionLookup(l: { source: string; externalId: string; url: 
 export async function fetchDescription(l: { source: string; externalId: string; url: string }): Promise<string | null> {
   const lookup = descriptionLookup(l);
   if (!lookup) return null;
+  if (lookup.kind === "page") {
+    const html = await fetchPublicPage(lookup.url);
+    const raw = html ? jobPostingFromHtml(html) : null;
+    const text = raw ? htmlToText(raw) : "";
+    return text.length >= 80 ? text : null;
+  }
   const json = await fetchJson<Json>(lookup.api, 10000);
   let raw: unknown = null;
   if (lookup.kind === "greenhouse") raw = json.content;
   else if (lookup.kind === "lever") raw = [json.descriptionPlain, ...((json.lists ?? []) as Json[]).map((x) => `${x.text}\n${htmlToText(String(x.content ?? ""))}`), json.additionalPlain].filter(Boolean).join("\n\n");
   else if (lookup.kind === "ashby") raw = ((json.jobs ?? []) as Json[]).find((j) => j.id === lookup.id)?.descriptionPlain;
-  else raw = (json.jobPostingInfo as Json | undefined)?.jobDescription;
+  else if (lookup.kind === "smartrecruiters") raw = Object.values(((json.jobAd as Json | undefined)?.sections ?? {}) as Record<string, Json>).map((sec) => (sec && typeof sec.text === "string" ? `${sec.title ? `<h3>${sec.title}</h3>` : ""}${sec.text}` : "")).join("\n");
+  else if (lookup.kind === "oracle") {
+    const it = ((json.items ?? []) as Json[])[0] ?? {};
+    raw = [it.ExternalDescriptionStr, it.ExternalResponsibilitiesStr, it.ExternalQualificationsStr].filter((x) => typeof x === "string" && x).join("\n");
+  } else raw = (json.jobPostingInfo as Json | undefined)?.jobDescription;
   const text = typeof raw === "string" ? htmlToText(raw) : "";
   return text.length >= 80 ? text : null;
 }

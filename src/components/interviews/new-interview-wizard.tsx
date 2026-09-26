@@ -189,6 +189,12 @@ export function NewInterviewWizard(props: {
                 </button>
                 <input ref={jdFile} type="file" className="sr-only" accept=".pdf,.docx,.txt" aria-label="Upload job description file" onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadJd(f); }} />
               </div>
+              {props.job && !props.job.description && !jd && (
+                <p className="mb-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                  {props.job.company}&apos;s careers site doesn&apos;t let us read this posting automatically.{" "}
+                  <a href={props.job.url} target="_blank" rel="noopener noreferrer" className="font-medium underline">Open the posting</a>, copy the description and paste it here so the questions match the job.
+                </p>
+              )}
               <Textarea id="jd" value={jd} onChange={(e) => setJd(e.target.value)} placeholder="Paste the job description and the AI will tailor questions to the skills it asks for." className="min-h-[140px]" maxLength={20000} />
             </div>
             <div>

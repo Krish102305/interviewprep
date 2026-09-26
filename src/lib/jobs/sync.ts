@@ -4,6 +4,8 @@ import { BOARDS, COMMUNITY_FEEDS, type Board } from "./boards";
 import { boardUrl, fetchDescription, fetchJson, normalizeAshby, normalizeCommunity, normalizeGreenhouse, normalizeLever, type RawListing } from "./sources";
 
 const SYNC_ID = "internships";
+/** Bump the suffix when description readers improve so earlier misses get retried. */
+const UNAVAILABLE = "unavailable:2";
 const REFRESH_HOURS = Number(process.env.JOBS_REFRESH_HOURS) || 12;
 const STALE_LOCK_MS = 15 * 60_000;
 export const jobsSyncEnabled = () => process.env.JOBS_SYNC !== "off";
@@ -151,16 +153,21 @@ export async function syncJobs() {
 export async function ensureDescription(id: string) {
   const l = await db.jobListing.findUnique({ where: { id } });
   if (!l || l.descriptionStatus === "ok") return l;
-  // Don't hammer postings that failed recently.
-  if (l.descriptionStatus === "unavailable" && l.descriptionAt && Date.now() - l.descriptionAt.getTime() < 24 * 3600_000) return l;
+  // Don't hammer postings that failed recently with the current readers.
+  // (Older "unavailable" marks are retried once whenever the readers improve.)
+  if (l.descriptionStatus === UNAVAILABLE && l.descriptionAt && Date.now() - l.descriptionAt.getTime() < 24 * 3600_000) return l;
   let description: string | null = null;
   try {
     description = await fetchDescription(l);
   } catch (err) {
+    const status = (err as { status?: number }).status;
     console.warn(`[jobs] description fetch failed for ${l.id}:`, (err as Error).message);
+    // Outages, timeouts and server errors are temporary: try again on the next view.
+    // Only a posting that is actually gone counts as unavailable.
+    if (status !== 404 && status !== 410) return l;
   }
   return db.jobListing.update({
     where: { id },
-    data: description ? { description, descriptionStatus: "ok", descriptionAt: new Date() } : { descriptionStatus: "unavailable", descriptionAt: new Date() },
+    data: description ? { description, descriptionStatus: "ok", descriptionAt: new Date() } : { descriptionStatus: UNAVAILABLE, descriptionAt: new Date() },
   });
 }
