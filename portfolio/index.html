@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Krish · Projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: single 1080px column. Intro + real ship log, one flagship project spread, a grid of other work, a dated timeline, a toolkit list. */
+:root {
+  --bg: #eef1f5;
+  --surface: #ffffff;
+  --ink: #141920;
+  --muted: #5a6475;
+  --line: #d5dbe4;
+  --accent: #2946d6;
+  --accent-soft: #e2e7fb;
+  --live: #0f8a5f;
+  --display: "Syne", "Arial Black", system-ui, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1217; --surface: #161b23; --ink: #e8ecf2; --muted: #95a0b2;
+    --line: #283040; --accent: #8198ff; --accent-soft: #1d2540; --live: #3fcf98;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1217; --surface: #161b23; --ink: #e8ecf2; --muted: #95a0b2;
+  --line: #283040; --accent: #8198ff; --accent-soft: #1d2540; --live: #3fcf98;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 16px; line-height: 1.6;
+  padding-inline: 20px;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 48px 72px; display: grid; gap: 88px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.08; letter-spacing: -0.01em; }
+p { margin: 0; }
+.label {
+  font-family: var(--mono); font-size: 12px; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted);
+}
+.tags { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0; }
+.tags li {
+  font-family: var(--mono); font-size: 12px; padding: 3px 8px;
+  border: 1px solid var(--line); border-radius: 4px; color: var(--muted);
+}
+
+/* Top bar */
+.top { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.top .mark { font-family: var(--display); font-weight: 800; font-size: 20px; }
+.top nav { display: flex; gap: 20px; flex-wrap: wrap; font-size: 15px; }
+.top nav a { color: var(--ink); text-decoration: none; }
+.top nav a:hover { color: var(--accent); }
+
+/* Intro */
+.intro { display: grid; grid-template-columns: 1.15fr 1fr; gap: 48px; align-items: start; margin-top: -40px; }
+.intro > * { min-width: 0; }
+.intro h1 { font-size: clamp(44px, 7vw, 84px); font-weight: 800; }
+.intro h1 span { color: var(--accent); }
+.intro .lede { font-size: 19px; color: var(--muted); max-width: 34em; margin-top: 22px; }
+.intro .links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px;
+  border-radius: 6px; font-weight: 600; font-size: 15px; text-decoration: none;
+  border: 1px solid var(--ink); color: var(--ink);
+}
+.btn.primary { background: var(--ink); color: var(--bg); }
+.btn:hover { border-color: var(--accent); }
+.btn.primary:hover { background: var(--accent); color: #fff; }
+
+.log {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  font-family: var(--mono); font-size: 13px; overflow: hidden;
+}
+.log header { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+.log ol { list-style: none; margin: 0; padding: 8px 0; }
+.log li { display: grid; grid-template-columns: 62px 1fr; gap: 10px; padding: 5px 14px; }
+.log .sha { color: var(--accent); }
+.log .msg { min-width: 0; overflow-wrap: anywhere; }
+
+/* Section heads */
+.sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 28px; border-bottom: 1px solid var(--line); padding-bottom: 14px; }
+.sec-head h2 { font-size: clamp(28px, 4vw, 38px); font-weight: 700; }
+
+/* Flagship */
+.flag { display: grid; grid-template-columns: 1.3fr 1fr; gap: 40px; }
+.flag > * { min-width: 0; }
+.flag h3 { font-size: clamp(30px, 4.4vw, 46px); font-weight: 800; }
+.flag .tagline { font-size: 19px; margin-top: 10px; }
+.flag .desc { color: var(--muted); margin-top: 16px; max-width: 38em; }
+.flag ul.feats { margin: 22px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+.flag ul.feats li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; }
+.flag ul.feats li::before { content: ""; width: 8px; height: 8px; margin-top: 9px; background: var(--accent); border-radius: 2px; }
+.flag ul.feats b { font-weight: 600; }
+.flag .tags { margin-top: 24px; }
+.flag .links { display: flex; gap: 16px; margin-top: 22px; flex-wrap: wrap; font-weight: 600; }
+
+.stats { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 22px; display: grid; gap: 18px; align-content: start; }
+.stats dl { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 16px; margin: 0; }
+.stats dt { font-family: var(--mono); font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.stats dd { margin: 2px 0 0; font-family: var(--display); font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.stats .note { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 14px; }
+.room {
+  border-radius: 6px; background: var(--accent-soft); padding: 16px; display: grid; gap: 10px;
+  font-size: 14px;
+}
+.room .q { font-weight: 600; }
+.room .who { font-family: var(--mono); font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; }
+.room .bar { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.room .bar i { display: block; height: 100%; width: 62%; background: var(--accent); animation: count 2.5s linear infinite; transform-origin: left; }
+@keyframes count { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@media (prefers-reduced-motion: reduce) { .room .bar i { animation: none; } }
+
+/* Project grid */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 22px; display: grid; grid-template-rows: auto auto 1fr auto; gap: 12px; min-width: 0;
+}
+.card .meta { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.card h3 { font-size: 22px; font-weight: 700; }
+.card p { color: var(--muted); font-size: 15px; }
+.card .foot { display: grid; gap: 14px; }
+.card .foot a { font-weight: 600; font-size: 14px; }
+.pill { font-family: var(--mono); font-size: 11px; padding: 2px 7px; border-radius: 99px; border: 1px solid currentColor; white-space: nowrap; }
+.pill.priv { color: var(--muted); }
+.pill.fork { color: var(--accent); }
+.pill.live { color: var(--live); }
+
+/* Timeline */
+.tl { list-style: none; margin: 0; padding: 0; display: grid; }
+.tl li { display: grid; grid-template-columns: 120px 1fr; gap: 24px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.tl li:last-child { border-bottom: 0; }
+.tl time { font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.tl .what { min-width: 0; }
+.tl b { font-weight: 600; }
+.tl span { color: var(--muted); }
+
+/* Toolkit */
+.kit { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+.kit h3 { font-family: var(--mono); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 10px; }
+.kit ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+
+footer { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 22px; color: var(--muted); font-size: 14px; }
+
+@media (max-width: 900px) {
+  .intro, .flag { grid-template-columns: 1fr; }
+  .intro { margin-top: -20px; }
+  .grid { grid-template-columns: 1fr 1fr; }
+  .kit { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 600px) {
+  .wrap { gap: 64px; padding-block: 28px 48px; }
+  .grid { grid-template-columns: 1fr; }
+  .tl li { grid-template-columns: 1fr; gap: 2px; }
+  .stats dd { font-size: 26px; }
+  .log li { grid-template-columns: 56px 1fr; }
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="mark">Krish</div>
+    <nav aria-label="Sections">
+      <a href="#work">Work</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#toolkit">Toolkit</a>
+      <a href="https://github.com/Krish102305">GitHub</a>
+    </nav>
+  </div>
+
+  <section class="intro">
+    <div>
+      <p class="label">Builder · AI products · Full-stack</p>
+      <h1>I build software that <span>practices with you</span>.</h1>
+      <p class="lede">I make full-stack apps with AI at the center: an interview coach that talks back, a prototype pitching a new game mode to EA Sports, a bot that books library study rooms. Most of it ships in days, not months.</p>
+      <div class="links">
+        <a class="btn primary" href="#work">See the work</a>
+        <a class="btn" href="https://github.com/Krish102305">github.com/Krish102305</a>
+      </div>
+    </div>
+    <div class="log" aria-label="Recent commits to Interview Connect">
+      <header><span>interviewprep · git log</span><span>Sep 2026</span></header>
+      <ol>
+        <li><span class="sha">f77901c</span><span class="msg">Fill in job descriptions for far more internship listings</span></li>
+        <li><span class="sha">cb5fe0b</span><span class="msg">Add real internship listings with "Practice for this job"</span></li>
+        <li><span class="sha">d4bb4df</span><span class="msg">Stop the live site from silently losing accounts</span></li>
+        <li><span class="sha">dfa6ec5</span><span class="msg">Never transcribe the interviewer's own voice as the answer</span></li>
+        <li><span class="sha">5207c3a</span><span class="msg">Hands-free AI interviews and natural ElevenLabs voices</span></li>
+        <li><span class="sha">bc35fc6</span><span class="msg">Make the AI interviewer a realistic on-camera interviewer</span></li>
+        <li><span class="sha">18fe1c5</span><span class="msg">Add PostgreSQL production support and Railway deployment</span></li>
+        <li><span class="sha">f4dacb9</span><span class="msg">Scaffold Interview Connect: data model, auth, AI engine</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="work" aria-labelledby="work-h">
+    <div class="sec-head">
+      <h2 id="work-h">Featured project</h2>
+      <span class="label">Sep 22 – 28, 2026</span>
+    </div>
+    <article class="flag">
+      <div>
+        <h3>Interview Connect</h3>
+        <p class="tagline">Practice like it's the real interview.</p>
+        <p class="desc">An interview-practice platform for college students and job seekers. AI builds a custom interview from the job description and your resume, an AI or human interviewer runs it live on camera, and AI grades every answer against the same rubric.</p>
+        <ul class="feats">
+          <li><span><b>Hands-free AI interviewer.</b> Speaks with natural ElevenLabs voices, listens when it stops talking, asks follow-ups grounded in what you just said.</span></li>
+          <li><span><b>Practice for a real job.</b> Pick a real internship listing and get an interview built from its description.</span></li>
+          <li><span><b>Human interviews over WebRTC.</b> Peer-to-peer video, live transcription, AI-generated interviewer guides, and fit-scored matching between students and interviewers.</span></li>
+          <li><span><b>Grading you can trust.</b> Category scores, STAR analysis per answer, and quotes checked against the transcript so fabricated ones are dropped.</span></li>
+          <li><span><b>Fair conduct system.</b> Warnings first, admin-reviewed reports, three strikes, and appeals. Tech problems never count as misconduct.</span></li>
+        </ul>
+        <ul class="tags" aria-label="Built with">
+          <li>Next.js 15</li><li>React 19</li><li>TypeScript</li><li>Prisma</li><li>PostgreSQL</li><li>Claude API</li><li>ElevenLabs</li><li>WebRTC</li><li>Tailwind</li><li>Railway</li>
+        </ul>
+        <div class="links">
+          <a href="https://github.com/Krish102305/interviewprep">Source on GitHub →</a>
+        </div>
+      </div>
+      <aside class="stats" aria-label="Project stats">
+        <div class="room" aria-hidden="true">
+          <span class="who">Ava · AI interviewer</span>
+          <span class="q">"Tell me about a time a project didn't go as planned. What did you do next?"</span>
+          <span class="label">Listening · turn ends after a 2.5 s pause</span>
+          <span class="bar"><i></i></span>
+        </div>
+        <dl>
+          <div><dt>Lines of TS</dt><dd>15.7k</dd></div>
+          <div><dt>Pages</dt><dd>33</dd></div>
+          <div><dt>API routes</dt><dd>51</dd></div>
+          <div><dt>DB tables</dt><dd>32</dd></div>
+        </dl>
+        <p class="note">Student, interviewer and admin roles · unit and end-to-end tests · built and deployed in one week.</p>
+      </aside>
+    </article>
+  </section>
+
+  <section aria-labelledby="more-h">
+    <div class="sec-head">
+      <h2 id="more-h">More work</h2>
+      <span class="label">7 projects</span>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <div class="meta"><span class="label">Feb 2026 · Product</span><span class="pill priv">Private</span></div>
+        <h3>Madden Legacy Mode</h3>
+        <p>A product case study and clickable prototype pitched to EA Sports. Madden's user scores fell from 7.8 to 1.2 over a decade, so I proposed Legacy Eras: modern visuals with the gameplay of Madden 12 or Madden 20. The prototype walks through home, era select, all 32 teams, settings and a broadcast-style game view, with a one-pager that exports to PDF.</p>
+        <div class="foot"><ul class="tags"><li>React</li><li>TypeScript</li><li>Recharts</li><li>Figma</li></ul></div>
+      </article>
+      <article class="card">
+        <div class="meta"><span class="label">Apr 2026 · Data tool</span><span class="pill priv">Private</span></div>
+        <h3>Transcript Explorer</h3>
+        <p>A browser for meeting transcripts stored by client, year and date. Folder-style explorer with breadcrumbs, a transcript viewer and a sidebar, with the data layer isolated so the sample data can be swapped for the real storage API. A visualizations tab is set up for Power BI dashboards.</p>
+        <div class="foot"><ul class="tags"><li>React</li><li>Vite</li><li>shadcn/ui</li><li>Vitest</li></ul></div>
+      </article>
+      <article class="card">
+        <div class="meta"><span class="label">Jun 2025 · Automation</span><span class="pill live">Public</span></div>
+        <h3>NYU Bobst Room Booker</h3>
+        <p>A small API that books group study rooms at NYU's Bobst Library. Send a time, and a headless Chrome session logs in through NYU's portal and reserves the room. Packaged in Docker so it runs anywhere.</p>
+        <div class="foot"><ul class="tags"><li>Python</li><li>Flask</li><li>Selenium</li><li>Docker</li></ul><a href="https://github.com/Krish102305/nyu-booking-ai3">View repo →</a></div>
+      </article>
+      <article class="card">
+        <div class="meta"><span class="label">Fall 2026 · Class</span><span class="pill live">Public</span></div>
+        <h3>GroupMaker</h3>
+        <p>The class app for Projects in Programming &amp; Data Science. It shows the roster and shuffles it into groups, and grows over the semester. Flask API, React front end, deployed on Railway.</p>
+        <div class="foot"><ul class="tags"><li>Flask</li><li>React</li><li>Vite</li><li>Docker</li></ul><a href="https://github.com/Krish102305/pipF26_groupmaker-v0">View repo →</a></div>
+      </article>
+      <article class="card">
+        <div class="meta"><span class="label">Jul 2026 · Tooling</span><span class="pill fork">Fork</span></div>
+        <h3>AI Job Search</h3>
+        <p>My copy of a Claude Code framework for job hunting: scrape postings, score fit, and draft a tailored CV and cover letter in LaTeX with a reviewer agent checking the result.</p>
+        <div class="foot"><ul class="tags"><li>Claude Code</li><li>Python</li><li>LaTeX</li></ul><a href="https://github.com/Krish102305/ai-job-search">View repo →</a></div>
+      </article>
+      <article class="card">
+        <div class="meta"><span class="label">Sep 2026 · Team</span><span class="pill live">Public</span></div>
+        <h3>AI Project Team</h3>
+        <p>Set up our team's shared repo and the pull-request workflow: every member adds their own name on a branch, a teammate reviews and approves, then it merges.</p>
+        <div class="foot"><ul class="tags"><li>Python</li><li>Git</li><li>Code review</li></ul><a href="https://github.com/Krish102305/AiProjectTeam-">View repo →</a></div>
+      </article>
+      <article class="card">
+        <div class="meta"><span class="label">Mar 2025 · First site</span><span class="pill live">Public</span></div>
+        <h3>Emergency Excuse Button</h3>
+        <p>Where it started: a one-page site with six buttons for getting out of anything, from "Bad Connection" to "My Dog Ran Away".</p>
+        <div class="foot"><ul class="tags"><li>HTML</li></ul><a href="https://github.com/Krish102305/Lab5">View repo →</a></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="timeline" aria-labelledby="tl-h">
+    <div class="sec-head">
+      <h2 id="tl-h">Timeline</h2>
+      <span class="label">Mar 2025 → now</span>
+    </div>
+    <ol class="tl">
+      <li><time>Mar 2025</time><div class="what"><b>First web page.</b> <span>Emergency Excuse Button, plain HTML.</span></div></li>
+      <li><time>Jun 2025</time><div class="what"><b>First automation.</b> <span>NYU Bobst Room Booker, three iterations in two days, ending on Selenium in Docker.</span></div></li>
+      <li><time>Feb 2026</time><div class="what"><b>First product pitch.</b> <span>Madden Legacy Mode case study and prototype.</span></div></li>
+      <li><time>Apr 2026</time><div class="what"><b>Data tooling.</b> <span>Transcript Explorer.</span></div></li>
+      <li><time>Jul 2026</time><div class="what"><b>AI agents for the job hunt.</b> <span>Set up the AI Job Search framework.</span></div></li>
+      <li><time>Aug 2026</time><div class="what"><b>Projects in Programming &amp; Data Science.</b> <span>GroupMaker v0.</span></div></li>
+      <li><time>Sep 2026</time><div class="what"><b>Interview Connect.</b> <span>A full AI interview platform, built and deployed in a week. Led the AI Project Team repo.</span></div></li>
+    </ol>
+  </section>
+
+  <section id="toolkit" aria-labelledby="kit-h">
+    <div class="sec-head">
+      <h2 id="kit-h">Toolkit</h2>
+      <span class="label">From the code above</span>
+    </div>
+    <div class="kit">
+      <div><h3>Languages</h3><ul><li>TypeScript</li><li>Python</li><li>SQL</li><li>HTML &amp; CSS</li></ul></div>
+      <div><h3>Front end</h3><ul><li>React &amp; Next.js</li><li>Vite</li><li>Tailwind, shadcn/ui</li><li>Recharts</li></ul></div>
+      <div><h3>Back end</h3><ul><li>Next.js route handlers</li><li>Flask</li><li>Prisma, PostgreSQL, SQLite</li><li>Docker, Railway</li></ul></div>
+      <div><h3>AI &amp; media</h3><ul><li>Claude API</li><li>ElevenLabs voice</li><li>WebRTC, Web Speech</li><li>Selenium</li></ul></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Krish · <a href="https://github.com/Krish102305">github.com/Krish102305</a></span>
+    <span>Updated Sep 2026</span>
+  </footer>
+</div>
+</body>
+</html>
