@@ -1,0 +1,7 @@
+{
+  "mode": "paper",
+  "starting_balance_usd": 1000,
+  "max_bet_usd": 100,
+  "daily_limit_usd": 300,
+  "unit_usd": 10
+}
