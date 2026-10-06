@@ -1,7 +1,0 @@
-{
-  "permissions": {
-    "ask": [
-      "Bash(python3 polybot/paper.py place:*)"
-    ]
-  }
-}
